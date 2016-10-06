@@ -120,7 +120,6 @@ bot.on('message', (payload, reply) => {
 			// Checking to see if user exists
 			queryUserDocument(fbid, db, function(err, result){
 				if (err == null) {
-					console.log(result);
 					if (result.length > 0){
 						// This means a user is found
 						// We will parse the user's message to see what type of query he has made

@@ -1,5 +1,5 @@
 const http = require('http');
-const https = require('https');
+// const https = require('https');
 const Bot = require('messenger-bot');
 const request = require('request');
 const MongoClient = require('mongodb').MongoClient;
@@ -9,10 +9,10 @@ const assert = require('assert');
 const express = require('express');
 const fs = require('fs');
 
-var options = {
-	key: fs.readFileSync('./ssl/private.pem'),
-	cert: fs.readFileSync('./ssl/certificate.pem')
-};
+// var options = {
+// 	key: fs.readFileSync('./ssl/private.pem'),
+// 	cert: fs.readFileSync('./ssl/certificate.pem')
+// };
 
 /*
  * Machine learning stuffs here!
@@ -135,14 +135,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
-app.use(function(req, res, next) {
-	if(req.headers['x-forwarded-proto']==='http') {
-		return res.redirect(['https://', req.get('Host'), req.url].join(''));
-	}
-	next();
-});
 
-var server = https.createServer(options, app).listen(80);
+var server = http.createServer(options, app).listen(8080);
 console.log('Echo bot server running at port 8080.');
 
 

@@ -421,6 +421,8 @@ function checkFlight(flightID, reply){
 	var flightAlpha = flightID.replace(/[0-9]/g, '');
 	var flightNum = flightID.replace(/([a-zA-Z ])/g,'');
 
+	console.log(flightAlpha, flightNum);
+
 	// Make an immediate reply first so that user doesn't think its lagging!
 	reply({text: "Searching your flight details for you! This may take some time, please be patient!"}, function(err, info){});
 

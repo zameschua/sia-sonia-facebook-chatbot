@@ -125,18 +125,38 @@ bot.on('message', (payload, reply) => {
 	bot.getProfile(fbid, (err, profile) => {
 		if (err) throw err;
 
+
+
+
 		// Connecting to DB
 		MongoClient.connect(url, function(err, db) {
 			assert.equal(null, err);
 
 			// Checking to see if user exists
-			queryUserDocument(fbid, db, function(err, result){
+			queryUserDocument(fbid, db, function(err, user){
 				if (err == null) {
-					if (result.length > 0){
+					if (user.length > 0){
 						// This means a user is found
-						// We will parse the user's message to see what type of query he has made
-						sendReply(fbid, queryType, reply);
-						db.close();
+
+						// This will assume user is typing in a flight ID, because he typed something alphanumeric
+						if (/^[a-z0-9]+$/i.test(userQuery)){
+							var params = {
+								"userID": fbid,
+								"directions": 0,
+								"checkFlight": 0,
+								"flightID": flightID
+							};
+							updateUserDocument(fbid, params, db, function(err, result){
+								if (!err){
+									reply({text: "Ok we've noted your flight number! How can i help you?"}, function(err, info){});
+								}
+								db.close();
+							});
+						} else {
+							// We will parse the user's message to see what type of query he has made
+							sendReply(user, fbid, queryType, reply);
+							db.close();
+						}
 					} else {
 						insertUserDocument(fbid, db, function(err, result){
 							reply({text: "It seems like you're a first time user, we've registered an account for you!"}, function(err, info){
@@ -256,43 +276,35 @@ var updateUserDocument = function(userID, data, db, callback){
 	});
 };
 
-function sendReply(fbid, queryType, reply){
+function sendReply(user, fbid, queryType, reply){
 
-	MongoClient.connect(url, function(err, db) {
-		assert.equal(null, err);
+	if (user.length > 0){
+		if (user[0].flightID == ""){
+			askForFlightNumber(reply);
+			return;
+		}
 
-		queryUserDocument(fbid, db, function(err, result){
-			if (result.length > 0){
-				if (result[0].flightID == ""){
-					askForFlightNumber(reply);
-					return;
-				}
-
-				for (var i = 0; i < queryType.length; i++){
-					if (queryType[i] == "need_directions"){
-						sendDirections(reply);
-					} else if (queryType[i] == "check_flight"){
-						checkFlight(reply);
-					} else if (queryType[i] == "remind_me"){
-						remindMe(result[0].flightID, reply);
-					} else if (queryType[i] == "check_weather"){
-						checkWeather(result[0].flightID, reply);
-					} else if (queryType[i] == "negative_response"){
-						negativeResponse(reply);
-					} else if (queryType[i] == "positive_response"){
-						positiveResponse(reply);
-					} else {
-						defaultReply(reply);
-					}
-				}
-
+		for (var i = 0; i < queryType.length; i++){
+			if (queryType[i] == "need_directions"){
+				sendDirections(reply);
+			} else if (queryType[i] == "check_flight"){
+				checkFlight(reply);
+			} else if (queryType[i] == "remind_me"){
+				remindMe(user[0].flightID, reply);
+			} else if (queryType[i] == "check_weather"){
+				checkWeather(user[0].flightID, reply);
+			} else if (queryType[i] == "negative_response"){
+				negativeResponse(reply);
+			} else if (queryType[i] == "positive_response"){
+				positiveResponse(reply);
 			} else {
-				// This means user document wasn't found, which shouldn't be possible
+				defaultReply(reply);
 			}
-		});
+		}
 
-		db.close();
-	});
+	} else {
+		// This means user document wasn't found, which shouldn't be possible
+	}
 
 }
 
@@ -326,6 +338,9 @@ function sendDirections(reply){
 }
 
 function remindMe(flightID, reply){
+	// var flightNum = userQuery.replace(/^\D+/g, '');
+
+
 	reply({text:"Okay sure! Based on your flight ID of: " + flightID +  ", We will remind you 7 days, 3 days, 1 day, " +
 	"and also 5 hours before your flight! (But for proof of concept, we shall remind you in 10 seconds! :)"}, function(err, info) {
 		if (err) {

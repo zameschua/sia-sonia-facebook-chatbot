@@ -10,11 +10,6 @@ const express = require('express');
 const fs = require('fs');
 const _ = require("underscore");
 
-// var options = {
-// 	key: fs.readFileSync('./ssl/private.pem'),
-// 	cert: fs.readFileSync('./ssl/certificate.pem')
-// };
-
 /*
  * Machine learning stuffs here!
  */
@@ -63,6 +58,37 @@ intentClassifier.trainBatch([
 	{input: "Can i check my boarding gate", output: "check_flight"},
 	{input: "Can i check my boarding time?", output: "check_flight"},
 	{input: "Can i check my boarding time", output: "check_flight"},
+
+	{input: "Do you think you can remind me of my flight?", output: "remind_me"},
+	{input: "Could you remind me of my flight?", output: "remind_me"},
+	{input: "Could you remind me later?", output: "remind_me"},
+	{input: "Can you remind me later?", output: "remind_me"},
+	{input: "Could you notify me later?", output: "remind_me"},
+	{input: "Could you notify me of my flight later?", output: "remind_me"},
+	{input: "Can you notify me of my flight later?", output: "remind_me"},
+	{input: "Please remind me", output: "remind_me"},
+	{input: "Do remind me later!", output: "remind_me"},
+	{input: "Do notify me later!", output: "remind_me"},
+
+	{input: "Can i check the weather for my flight?", output: "check_weather"},
+	{input: "What's the weather like?", output: "check_weather"},
+	{input: "Do you think i could check the weather for my flight?", output: "check_weather"},
+	{input: "Can i check the weather?", output: "check_weather"},
+	{input: "Hey what's the weather like?", output: "check_weather"},
+	{input: "What's the weather at", output: "check_weather"},
+	{input: "What's the weather like later?", output: "check_weather"},
+
+	{input: "No", output: "negative_response"},
+	{input: "Dude", output: "negative_response"},
+	{input: "Go to hell", output: "negative_response"},
+	{input: "Screw off", output: "negative_response"},
+	{input: "How about no", output: "negative_response"},
+
+	{input: "Thanks so much!", output: "positive_response"},
+	{input: "Thanks for the help!", output: "positive_response"},
+	{input: "Appreciate it!", output: "positive_response"},
+	{input: "Thank you", output: "positive_response"},
+
 ]);
 
 
@@ -72,14 +98,6 @@ intentClassifier.trainBatch([
 /*
  * END machine learning stuffs here!
  */
-
-var userSessions = {
-	// The number represents the FB ID, and we will track the user sessions
-	// This is just an example object
-	1231240: {
-		checkFlight: 0
-	}
-}; // This object is to store sessions
 
 var url = 'mongodb://localhost:27017/sia';
 MongoClient.connect(url, function(err, db) {
@@ -107,12 +125,6 @@ bot.on('message', (payload, reply) => {
 	bot.getProfile(fbid, (err, profile) => {
 		if (err) throw err;
 
-		// This checks to see if user is already inside the sessions
-		// If user is already inside, this means that user has already made questions before
-		if (_.has(userSessions, fbid)){
-
-		}
-
 		// Connecting to DB
 		MongoClient.connect(url, function(err, db) {
 			assert.equal(null, err);
@@ -123,11 +135,11 @@ bot.on('message', (payload, reply) => {
 					if (result.length > 0){
 						// This means a user is found
 						// We will parse the user's message to see what type of query he has made
-						sendReply(queryType, reply);
+						sendReply(fbid, queryType, reply);
 					} else {
 						insertUserDocument(fbid, db, function(err, result){
 							reply({text: "It seems like you're a first time user, we've registered an account for you!"}, function(err, info){
-								sendReply(queryType, reply);
+								askForFlightNumber(reply);
 							});
 						});
 					}
@@ -204,35 +216,12 @@ var fakeJson = {"code":200,"customers":[{"flightInfo":{"qrCodeBinary":"longasssh
 var link = "https://graph.facebook.com/v2.6/me/messages?access_token=EAADNE5iTX2kBAMUkSZAOgh27tQPlElKHJcC2pMM5tsiTbnBfHyoV0yQqWEAo9mBj6VNS9ybFWs5CRq8MBu6SjAIIHYZCtabHGM7qpyHIQoZBT2FXBFKcLmV1qiT6HjyUpmEm6GCflaTbrfTE0DJFOPx1BLg57b6rgQXVDS7ZBQZDZD"
 */
 
-var insertFlightDocument = function(db, callback) {
-	db.collection('flights').insertOne( {
-		"address" : {
-			"street" : "2 Avenue",
-			"zipcode" : "10075",
-			"building" : "1480",
-			"coord" : [ -73.9557413, 40.7720266 ]
-		},
-		"flightID" : "41704620"
-	}, function(err, result) {
-		assert.equal(err, null);
-		console.log("Inserted a document into the flights collection.");
-		callback(err, result);
-	});
-};
-
-var queryFlightDocument = function(flightID, db, callback){
-	db.collection('flights').find({
-		"flightID" : flightID
-	}).toArray(function(err, results){
-		assert.equal(err, null);
-		callback(err, results);
-	});
-};
-
 var insertUserDocument = function(userID, db, callback) {
-	db.collection('users').insertOne( {
+	db.collection('users').insertOne({
 		"userID": userID, // This could be the FBID etc
-		"flightID": [] // A user could have many flights purchased
+		"directions": 1,
+		"checkFlight": 0,
+		"flightID": ""
 	}, function(err, result) {
 		assert.equal(err, null);
 		console.log("Inserted a document into the users collection.");
@@ -249,28 +238,67 @@ var queryUserDocument = function(userID, db, callback){
 	});
 };
 
+var updateUserDocument = function(userID, data, db, callback){
 
-function sendReply(queryType, reply){
-	for (var i = 0; i < queryType.length; i++){
-		if (queryType[i] == "need_directions"){
-			console.log("holy shit, need_directions work");
-			sendDirections(reply);
-		} else if (queryType[i] == "check_flight"){
-			console.log("holy shit, check_flight work");
-			checkFlight(reply);
-		} else {
-			defaultReply(reply);
-		}
-	}
+	var toUpdate = {};
+	if (data.directions != undefined)
+		toUpdate[userID].directions = data.directions;
+	if (data.checkFlight != undefined)
+		toUpdate[userID].checkFlight = data.checkFlight;
+	if (data.flightID != undefined)
+		toUpdate[userID].flightID = data.flightID;
+
+	db.collection('users').update({
+		"userID": userID, // This could be the FBID etc
+	}, {$set: toUpdate}, function(err, result){
+		callback(err, result);
+	});
+};
+
+function sendReply(fbid, queryType, reply){
+
+	MongoClient.connect(url, function(err, db) {
+		assert.equal(null, err);
+
+		queryUserDocument(fbid, db, function(err, result){
+			if (result.length > 0){
+				if (result[0].flightID == ""){
+					askForFlightNumber(reply);
+					return;
+				}
+
+				for (var i = 0; i < queryType.length; i++){
+					if (queryType[i] == "need_directions"){
+						sendDirections(reply);
+					} else if (queryType[i] == "check_flight"){
+						checkFlight(reply);
+					} else if (queryType[i] == "remind_me"){
+						remindMe(result[0].flightID, reply);
+					} else if (queryType[i] == "check_weather"){
+						checkWeather(result[0].flightID, reply);
+					} else if (queryType[i] == "negative_response"){
+						negativeResponse(reply);
+					} else if (queryType[i] == "positive_response"){
+						positiveResponse(reply);
+					} else {
+						defaultReply(reply);
+					}
+				}
+
+			} else {
+				// This means user document wasn't found, which shouldn't be possible
+			}
+		});
+
+		db.close();
+	});
+
 }
 
 
 function sendDirections(reply){
 
 	//In order for us to give you directions, we would need your flight ID
-
-
-
 	var lat = 1.3644202;
 	var long = 103.99153079999996;
 	var mapJSON = {
@@ -296,28 +324,42 @@ function sendDirections(reply){
 	})
 }
 
+function remindMe(flightID, reply){
+	reply({text:"Okay sure! Based on your flight ID of: " + flightID +  ", We will remind you 7 days, 3 days, 1 day, " +
+	"and also 5 hours before your flight! (But for proof of concept, we shall remind you in 10 seconds! :)"}, function(err, info) {
+		if (err) {
+			console.log(err);
+		}
+	});
+}
+
+function checkWeather(flightID, reply){
+	reply({text:"Based on your flight ID of: " + flightID +  ", the weather at Singapore will be rainy " +
+	"at the time which you touch down!"}, function(err, info) {
+		if (err) {
+			console.log(err);
+		}
+	});
+}
+
+function negativeResponse(reply){
+	reply({text: "That doesn't help me do my job :("}, function(err, info) {
+		if (err) {
+			console.log(err);
+		}
+	});
+}
+
+function positiveResponse(reply){
+	reply({text: "Great! It has been nice chatting! :)"}, function(err, info) {
+		if (err) {
+			console.log(err);
+		}
+	});
+}
+
 function checkFlight(reply){
-
-	// MongoClient.connect(url, function(err, db) {
-	// 	assert.equal(null, err);
-    //
-	// 	queryFlightDocument(db, function(err, result){
-	// 		if (err == null) {
-	// 			if (result != null){
-	// 				// This is fired if user has a flight
-    //
-	// 			} else {
-	// 				// If this flight is not stored under the user, then we shall insert it
-    //
-	// 			}
-	// 		} else {
-	// 			console.log(err);
-	// 		}
-	// 	});
-	// 	db.close();
-	// });
-
-	reply({text:"Can i have your flight registration ID?"}, function(err, info) {
+	reply({text:"Here are your flight details: "}, function(err, info) {
 		if (err) {
 			console.log(err);
 		}
@@ -330,4 +372,12 @@ function defaultReply(reply){
 			console.log(err);
 		}
 	})
+}
+
+function askForFlightNumber(reply){
+	reply({text:"Do you think i could have your registration ID, so i can help you better?"}, function(err, info) {
+		if (err) {
+			console.log(err);
+		}
+	});
 }

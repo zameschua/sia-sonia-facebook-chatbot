@@ -2,8 +2,10 @@ const http = require('http');
 const Bot = require('messenger-bot');
 const request = require('request');
 const MongoClient = require('mongodb').MongoClient;
-var limdu = require('limdu');
+const bodyParser = require('body-parser');
+const limdu = require('limdu');
 const assert = require('assert');
+const express = require('express');
 
 /*
  * Machine learning stuffs here!
@@ -40,9 +42,9 @@ intentClassifier.trainBatch([
 	{input: "I'm not sure where to go", output: "need_directions"},
 	{input: "I'm unsure where to go", output: "need_directions"},
 
-	{input: "Hi i'm checking my flight", output: "check_flight"},
-	{input: "Hi i need to check about my flight", output: "check_flight"},
-	{input: "Hi do you think you can help me check my flight?", output: "check_flight"},
+	{input: "I'm checking my flight", output: "check_flight"},
+	{input: "I need to check about my flight", output: "check_flight"},
+	{input: "Do you think you can help me check my flight?", output: "check_flight"},
 	{input: "What's my flight", output: "check_flight"},
 	{input: "Can you help me check flight details?", output: "check_flight"},
 	{input: "Can i check my flight details?", output: "check_flight"},
@@ -53,12 +55,6 @@ intentClassifier.trainBatch([
 	{input: "Can i check my boarding gate", output: "check_flight"},
 	{input: "Can i check my boarding time?", output: "check_flight"},
 	{input: "Can i check my boarding time", output: "check_flight"},
-
-	// umm add flight details
-	// flight diming
-	// flight timing
-	// boarding gate
-	// boarding time
 ]);
 
 
@@ -83,11 +79,6 @@ var bot = new Bot({
   verify: 'sia-app-challenge-bot'
 });
 
-
-var tempDB = {
-	1292592927427179: {name: "Zames", flight: "SQKII10"}
-};
-
 bot.on('error', (err) => {
   console.log(err.message)
 });
@@ -98,93 +89,86 @@ bot.on('message', (payload, reply) => {
 	var userQuery = payload.message.text;
 	var queryType = intentClassifier.classify(userQuery) // E.g. ['need_directions','check_flight']
 
+	bot.getProfile(fbid, (err, profile) => {
+		if (err) throw err;
+
+		// Connecting to DB
+		MongoClient.connect(url, function(err, db) {
+			assert.equal(null, err);
+
+			// Checking to see if user exists
+			queryUserDocument(fbid, db, function(err, result){
+				if (err == null) {
+					if (result.length > 0){
+						// This means a user is found
+
+						// We will parse the user's message to see what type of query he has made
+						for (var i = 0; i < queryType.length; i++){
+							if (queryType[i] == "need_directions"){
+								console.log("holy shit, need_directions work");
+								sendDirections(reply);
+							} else if (queryType[i] == "check_flight"){
+								console.log("holy shit, check_flight work");
+								checkFlight(reply);
+							} else {
+								defaultReply(reply);
+							}
+						}
+					} else {
+						defaultReply(reply);
+					}
+				} else {
+					console.log(err);
+				}
+			});
+			db.close();
+		});
+
+	});
+
+})
+
+let app = express()
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({
+	extended: true
+}));
+
+var server = http.createServer(app).listen(8080)
+console.log('Echo bot server running at port 8080.')
+
+
+app.get('/', (req, res) => {
+	return bot._verify(req, res)
+});
+
+app.post('/', (req, res) => {
+	bot._handleMessage(req.body)
+	res.end(JSON.stringify({status: 'ok'}))
+});
+
+app.get('/test', (req, res)=> {
+
+	// the same kind of magic happens here!
+	var userQuery = "Hi I'm lost";
+	if (req.query.message != undefined){
+		userQuery = req.query.message;
+	}
+
+	var queryType = intentClassifier.classify(userQuery) // E.g. ['need_directions','check_flight']
+
 	for (var i = 0; i < queryType.length; i++){
 		if (queryType[i] == "need_directions"){
-			reply("holy shit, need_directions work",function(err, info){
-				console.log("holy shit, need_directions work");
-			});
-
+			console.log("holy shit, need_directions work");
+			res.send("holy shit, need_directions work");
 		} else if (queryType[i] == "check_flight"){
-			reply("holy shit, check_flight work",function(err, info){
-				console.log("holy shit, check_flight work");
-			});
+			console.log("holy shit, check_flight work");
+			res.send("holy shit, check_flight work");
 		}
 	}
 
-
-	bot.getProfile(fbid, (err, profile) => {
-		if (err) throw err;
-	    if (fbid in tempDB) {
-	    	var lat = 1.3644202;
-			var long = 103.99153079999996;
-	    	var mapJSON = {	    
-	    		"attachment": {
-			        "type": "template",
-			        "payload": {
-			            "template_type": "generic",
-			            "elements": {
-			                "element": {
-			                    "title": "Follow the map to get to Belt 16!", //Change to belt number??
-			                    "image_url": "https:\/\/maps.googleapis.com\/maps\/api\/staticmap?size=764x400&center="+lat+","+long+"&zoom=15&markers="+lat+","+long,
-			                    "item_url": "http:\/\/maps.apple.com\/maps?q="+lat+","+long+"&z=15"
-			                }
-			            }
-			        }
-	    		}
-	    	};
-
-	    	reply(mapJSON, function(err, info) {
-	    		if (err) {
-	    			console.log(err);
-	    		}
-	    	})
-	    	
-	    } else {
-	    	var dbData = {
-	    		fbid: {
-	    			name: profile.first_name,
-	    			flight: "SQKII10", //CHECK IF MESSAGE IS FLIGHT NUMBER
-	    		}
-	    	};
-
-			MongoClient.connect(url, function(err, db) {
-				assert.equal(null, err);
-
-				insertFlightDocument(db, function(){
-					console.log("Successfully saved data to db.");
-				});
-				db.close();
-			});
-
-	    	//Put data into database
-	    	//Give flight info
-	    	//Stack the alert messages into queue
-	    	console.log(profile);
-	    }
-	})
-
-
-
-
-
-
-
-//    var text = payload.message.text;
-
-//    console.log(payload);
-
-
-
-//    reply({ text }, (err) => {
-//      if (err) throw err
-
-//      console.log(`Echoed back to ${profile.first_name}               ${profile.last_name}: ${text}`)
-//    })
-	console.log(tempDB);
-})
-
-http.createServer(bot.middleware()).listen(8080)
-console.log('Echo bot server running at port 8080.')
+});
 
 
 
@@ -216,7 +200,102 @@ var insertFlightDocument = function(db, callback) {
 		"flightID" : "41704620"
 	}, function(err, result) {
 		assert.equal(err, null);
-		console.log("Inserted a document into the restaurants collection.");
-		callback();
+		console.log("Inserted a document into the flights collection.");
+		callback(err, result);
 	});
 };
+
+var queryFlightDocument = function(flightID, db, callback){
+	db.collection('flights').find( {
+		"flightID" : flightID
+	}, function(err, result) {
+		assert.equal(err, null);
+		console.log(result);
+		console.log("Inserted a document into the flights collection.");
+		callback(err, result);
+	});
+};
+
+var insertUserDocument = function(db, callback) {
+	db.collection('users').insertOne( {
+		"userID": "", // This could be the FBID etc
+	}, function(err, result) {
+		assert.equal(err, null);
+		console.log("Inserted a document into the users collection.");
+		callback(err, result);
+	});
+};
+
+var queryUserDocument = function(userID, db, callback){
+	db.collection('users').find( {
+		"userID" : userID
+	}, function(err, result) {
+		assert.equal(err, null);
+		console.log(result);
+		console.log("Inserted a document into the users collection.");
+		callback(err, result);
+	});
+};
+
+
+function sendDirections(reply){
+	var lat = 1.3644202;
+	var long = 103.99153079999996;
+	var mapJSON = {
+		"attachment": {
+			"type": "template",
+			"payload": {
+				"template_type": "generic",
+				"elements": {
+					"element": {
+						"title": "Follow the map to get to Belt 16!", //Change to belt number??
+						"image_url": "https:\/\/maps.googleapis.com\/maps\/api\/staticmap?size=764x400&center="+lat+","+long+"&zoom=15&markers="+lat+","+long,
+						"item_url": "http:\/\/maps.apple.com\/maps?q="+lat+","+long+"&z=15"
+					}
+				}
+			}
+		}
+	};
+
+	reply(mapJSON, function(err, info) {
+		if (err) {
+			console.log(err);
+		}
+	})
+}
+
+function checkFlight(reply){
+
+	// MongoClient.connect(url, function(err, db) {
+	// 	assert.equal(null, err);
+    //
+	// 	queryFlightDocument(db, function(err, result){
+	// 		if (err == null) {
+	// 			if (result != null){
+	// 				// This is fired if user has a flight
+    //
+	// 			} else {
+	// 				// If this flight is not stored under the user, then we shall insert it
+    //
+	// 			}
+	// 		} else {
+	// 			console.log(err);
+	// 		}
+	// 	});
+	// 	db.close();
+	// });
+
+	reply({text:"Can i have your flight registration ID?"}, function(err, info) {
+		if (err) {
+			console.log(err);
+		}
+	});
+}
+
+function defaultReply(reply){
+	reply({text:"Sorry i don't understand your query!"}, function(err, info) {
+		if (err) {
+			console.log(err);
+		}
+	})
+}

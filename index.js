@@ -142,7 +142,7 @@ app.use(function(req, res, next) {
 	next();
 });
 
-var server = https.createServer(options, app).listen(8080);
+var server = https.createServer(options, app).listen(80);
 console.log('Echo bot server running at port 8080.');
 
 

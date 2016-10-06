@@ -87,7 +87,7 @@ bot.on('error', (err) => {
 bot.on('message', (payload, reply) => {
 	var fbid = payload.sender.id;
 	var userQuery = payload.message.text;
-	var queryType = intentClassifier.classify(userQuery) // E.g. ['need_directions','check_flight']
+	var queryType = intentClassifier.classify(userQuery); // E.g. ['need_directions','check_flight']
 
 	bot.getProfile(fbid, (err, profile) => {
 		if (err) throw err;
@@ -104,8 +104,8 @@ bot.on('message', (payload, reply) => {
 						// We will parse the user's message to see what type of query he has made
 						sendReply(queryType, reply);
 					} else {
-						insertUserDocument(fbid, function(err, result){
-							reply({text: "It seems like you're a first time user, we've added registered an account for you!"}, function(err, info){
+						insertUserDocument(fbid, db, function(err, result){
+							reply({text: "It seems like you're a first time user, we've registered an account for you!"}, function(err, info){
 								sendReply(queryType, reply);
 							});
 						});
@@ -120,17 +120,17 @@ bot.on('message', (payload, reply) => {
 
 	});
 
-})
+});
 
-let app = express()
+let app = express();
 
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-var server = http.createServer(app).listen(8080)
-console.log('Echo bot server running at port 8080.')
+var server = http.createServer(app).listen(8080);
+console.log('Echo bot server running at port 8080.');
 
 
 app.get('/', (req, res) => {
@@ -210,9 +210,9 @@ var queryFlightDocument = function(flightID, db, callback){
 	});
 };
 
-var insertUserDocument = function(db, callback) {
-	db.collection('users').insertOne( {
-		"userID": "", // This could be the FBID etc
+var insertUserDocument = function(userID, db, callback) {
+	db.users.insertOne( {
+		"userID": userID, // This could be the FBID etc
 		"flightID": [] // A user could have many flights purchased
 	}, function(err, result) {
 		assert.equal(err, null);
@@ -222,7 +222,7 @@ var insertUserDocument = function(db, callback) {
 };
 
 var queryUserDocument = function(userID, db, callback){
-	db.collection('users').find( {
+	db.users.find( {
 		"userID" : userID
 	}, function(err, result) {
 		assert.equal(err, null);
@@ -249,6 +249,11 @@ function sendReply(queryType, reply){
 
 
 function sendDirections(reply){
+
+	//In order for us to give you directions, we would need your flight ID
+
+
+
 	var lat = 1.3644202;
 	var long = 103.99153079999996;
 	var mapJSON = {

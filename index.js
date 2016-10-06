@@ -264,11 +264,11 @@ var updateUserDocument = function(userID, data, db, callback){
 
 	var toUpdate = {};
 	if (data.directions != undefined)
-		toUpdate[userID].directions = data.directions;
+		toUpdate.directions = data.directions;
 	if (data.checkFlight != undefined)
-		toUpdate[userID].checkFlight = data.checkFlight;
+		toUpdate.checkFlight = data.checkFlight;
 	if (data.flightID != undefined)
-		toUpdate[userID].flightID = data.flightID;
+		toUpdate.flightID = data.flightID;
 
 	db.collection('users').update({
 		"userID": userID, // This could be the FBID etc
@@ -393,7 +393,7 @@ function defaultReply(reply){
 }
 
 function askForFlightNumber(reply){
-	reply({text:"Do you think i could have your registration ID, so i can help you better?"}, function(err, info) {
+	reply({text:"Welcome! Do you think i could have your registration ID, so i can help you better?"}, function(err, info) {
 		if (err) {
 			console.log(err);
 		}

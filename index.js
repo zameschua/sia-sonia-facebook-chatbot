@@ -1,28 +1,36 @@
-const http = require('http')
-const Bot = require('messenger-bot')
+const http = require('http');
+const Bot = require('messenger-bot');
 const request = require('request');
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
+
+var url = 'mongodb://localhost:27017/sia';
+MongoClient.connect(url, function(err, db) {
+	assert.equal(null, err);
+	console.log("Connected correctly to server.");
+	db.close();
+});
 
 
 var bot = new Bot({
-  token: 'EAADNE5iTX2kBAMUkSZAOgh27tQPlElKHJcC2pMM5tsiTbnBfHyoV0yQqWEAo9mBj6VNS9ybFWs5CRq8MBu6SjAIIHYZCtabHGM7qpyHIQoZBT2FXBFKcLmV1qiT6HjyUpmEm6GCflaTbrfTE0DJFOPx1BLg57b6rgQXVDS7ZBQZDZD',
+  token: 'EAAaKuvOeZCMsBAAWz7G9Ovrt4uDS6P62itRhbCmGtQtmJIFW0bgZAk0eim9hWO8eZAbhNQV4wTZAAxtI8ZCYkBUW9XVvZClw2UpD1J6wVmNgZBnp0IZAQfKGGWgLTqDUfZCxTjqSabrFHPVyDCAmy4A9zQ3b8KYruhEGfAtxDk7rruwZDZD',
   verify: 'sia-app-challenge-bot'
-})
+});
 
 
 var tempDB = {
 	1292592927427179: {name: "Zames", flight: "SQKII10"}
-}
-
-
+};
 
 bot.on('error', (err) => {
   console.log(err.message)
-})
+});
 
 
 bot.on('message', (payload, reply) => {
 	var fbid = payload.sender.id;
-    bot.getProfile(fbid, (err, profile) => {
+
+	bot.getProfile(fbid, (err, profile) => {
 		if (err) throw err;
 	    if (fbid in tempDB) {
 	    	var lat = 1.3644202;
@@ -41,11 +49,12 @@ bot.on('message', (payload, reply) => {
 			            }
 			        }
 	    		}
-	    	}
+	    	};
+
 	    	reply(mapJSON, function(err, info) {
 	    		if (err) {
 	    			console.log(err);
-	    		};
+	    		}
 	    	})
 	    	
 	    } else {
@@ -54,7 +63,17 @@ bot.on('message', (payload, reply) => {
 	    			name: profile.first_name,
 	    			flight: "SQKII10", //CHECK IF MESSAGE IS FLIGHT NUMBER
 	    		}
-	    	}
+	    	};
+
+			MongoClient.connect(url, function(err, db) {
+				assert.equal(null, err);
+
+				insertFlightDocument(db, function(){
+					console.log("Successfully saved data to db.");
+				});
+				db.close();
+			});
+
 	    	//Put data into database
 	    	//Give flight info
 	    	//Stack the alert messages into queue
@@ -103,3 +122,19 @@ var fakeJson = {"code":200,"customers":[{"flightInfo":{"qrCodeBinary":"longasssh
 	    })
 var link = "https://graph.facebook.com/v2.6/me/messages?access_token=EAADNE5iTX2kBAMUkSZAOgh27tQPlElKHJcC2pMM5tsiTbnBfHyoV0yQqWEAo9mBj6VNS9ybFWs5CRq8MBu6SjAIIHYZCtabHGM7qpyHIQoZBT2FXBFKcLmV1qiT6HjyUpmEm6GCflaTbrfTE0DJFOPx1BLg57b6rgQXVDS7ZBQZDZD"
 */
+
+var insertFlightDocument = function(db, callback) {
+	db.collection('flights').insertOne( {
+		"address" : {
+			"street" : "2 Avenue",
+			"zipcode" : "10075",
+			"building" : "1480",
+			"coord" : [ -73.9557413, 40.7720266 ]
+		},
+		"flightID" : "41704620"
+	}, function(err, result) {
+		assert.equal(err, null);
+		console.log("Inserted a document into the restaurants collection.");
+		callback();
+	});
+};

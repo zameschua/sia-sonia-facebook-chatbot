@@ -225,7 +225,7 @@ var queryFlightDocument = function(flightID, db, callback){
 };
 
 var insertUserDocument = function(userID, db, callback) {
-	db.users.insertOne( {
+	db.collection('users').insertOne( {
 		"userID": userID, // This could be the FBID etc
 		"flightID": [] // A user could have many flights purchased
 	}, function(err, result) {
@@ -236,7 +236,7 @@ var insertUserDocument = function(userID, db, callback) {
 };
 
 var queryUserDocument = function(userID, db, callback){
-	db.users.find( {
+	db.collection('users').find( {
 		"userID" : userID
 	}, function(err, result) {
 		assert.equal(err, null);

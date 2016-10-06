@@ -129,7 +129,7 @@ bot.on('message', (payload, reply) => {
 
 });
 
-let app = express();
+var app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({

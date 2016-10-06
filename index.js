@@ -128,6 +128,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
+app.use(function(req, res, next) {
+	if(req.headers['x-forwarded-proto']==='http') {
+		return res.redirect(['https://', req.get('Host'), req.url].join(''));
+	}
+	next();
+});
 
 var server = http.createServer(app).listen(8080);
 console.log('Echo bot server running at port 8080.');

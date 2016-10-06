@@ -9,7 +9,11 @@ const assert = require('assert');
 const express = require('express');
 const fs = require('fs');
 const _ = require("underscore");
+const AlchemyLanguageV1 = require('watson-developer-cloud/alchemy-language/v1');
 
+var alchemy_language = new AlchemyLanguageV1({
+	api_key: '1889a7223446a6db5776d1e94a3887409ddbc319'
+});
 
 /*
  * Machine learning stuffs here!
@@ -185,6 +189,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
+app.use(express.static(process.cwd() + '/public'));
 
 var server = http.createServer(app).listen(8080);
 console.log('Echo bot server running at port 8080.');
@@ -227,18 +232,6 @@ app.get('/test', (req, res)=> {
 
 var fakeJson = {"code":200,"customers":[{"flightInfo":{"qrCodeBinary":"longassshithere","departureGate":"","departureAirport":"Singapore Changi","cabin":"Economy","eTicketNumber":"618241177233101","seatNumber":"047D","bookingReference":"248LJV","aircraftType":"Boeing 777-300ER","departureDate":"13 Jan","scheduledArrivalTime":"07:20AM","airlineUse":"001","departureTerminal":"T3","flightDeck":"","offPoint":"London","fullName":"TEST MR","boardPoint":"Singapore","isA380":false,"boardingDateTime":"12:15AM 13 Jan","membershipNo":"","boardPointCode":"SIN","flightNumber":"SQ306","boardingZone":
 "5","scheduledDepartureTime":"01:15AM","offPointCode":"LHR","arrivalAirport":"London Heathrow","did":"2301D78000006503","loungeText":"","operatingAirline":"Singapore Airlines"},"uci":"2301D78000006CA2"}],"message":""}
-
-
-/*
-	    bot.sendMessage(payload.sender.id, reply, function(err, info){
-	    	if (err){
-	    		console.log(err);
-	    	} else {
-	    		console.log(info);
-	    	}
-	    })
-var link = "https://graph.facebook.com/v2.6/me/messages?access_token=EAADNE5iTX2kBAMUkSZAOgh27tQPlElKHJcC2pMM5tsiTbnBfHyoV0yQqWEAo9mBj6VNS9ybFWs5CRq8MBu6SjAIIHYZCtabHGM7qpyHIQoZBT2FXBFKcLmV1qiT6HjyUpmEm6GCflaTbrfTE0DJFOPx1BLg57b6rgQXVDS7ZBQZDZD"
-*/
 
 var insertUserDocument = function(userID, db, callback) {
 	db.collection('users').insertOne({
@@ -371,6 +364,8 @@ function checkWeather(flightID, reply){
 			'Accept': 'application/json'
 		}
 	}, function(requestErr, requestRes, requestBody){
+		requestBody = JSON.parse(requestBody);
+
 		if (requestBody.success) {
 			var responseText = "Based on your flight ID of: " + flightID + ", the weather at " + requestBody.flightRecord[0].city + " will be " + "rainy" + " at the time you touch down!";
 
@@ -421,8 +416,6 @@ function checkFlight(flightID, reply){
 	var flightAlpha = flightID.replace(/[0-9]/g, '');
 	var flightNum = flightID.replace(/([a-zA-Z ])/g,'');
 
-	console.log(flightAlpha, flightNum);
-
 	// Make an immediate reply first so that user doesn't think its lagging!
 	reply({text: "Searching your flight details for you! This may take some time, please be patient!"}, function(err, info){});
 
@@ -434,8 +427,8 @@ function checkFlight(flightID, reply){
 			'Accept': 'application/json'
 		}
 	}, function(requestErr, requestRes, requestBody){
-		console.log(requestBody);
-		console.log(requestBody.success);
+		requestBody = JSON.parse(requestBody);
+
 		if (requestBody.success) {
 			var responseText = "Here are your flight details for " + flightID + ":\nFlight Date - " + requestBody.flightDate + "\n Terminal Number - " + requestBody.flightRecord[0].terminal + "\n Flight Duration - " + requestBody.flightRecord[0].duration + "\n Headed For - " + requestBody.flightRecord[0].city;
 
@@ -467,7 +460,7 @@ function defaultReply(reply){
 }
 
 function askForFlightNumber(reply){
-	reply({text:"Welcome! Do you think i could have your registration ID, so i can help you better?"}, function(err, info) {
+	reply({text:"Welcome! Do you think i could have your Flight Number, so i can help you better?"}, function(err, info) {
 		if (err) {
 			console.log(err);
 		}

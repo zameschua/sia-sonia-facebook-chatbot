@@ -12,6 +12,7 @@
   "author": "Zames",
   "license": "ISC",
   "dependencies": {
-    "messenger-bot": "^2.3.0"
+    "messenger-bot": "^2.3.0",
+    "watson-developer-cloud": "^2.4.6"
   }
 }

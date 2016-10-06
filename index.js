@@ -2,7 +2,73 @@ const http = require('http');
 const Bot = require('messenger-bot');
 const request = require('request');
 const MongoClient = require('mongodb').MongoClient;
+var limdu = require('limdu');
 const assert = require('assert');
+
+/*
+ * Machine learning stuffs here!
+ */
+
+// First, define our base classifier type (a multi-label classifier based on winnow):
+var TextClassifier = limdu.classifiers.multilabel.BinaryRelevance.bind(0, {
+	binaryClassifierType: limdu.classifiers.Winnow.bind(0, {retrain_count: 10})
+});
+
+// Now define our feature extractor - a function that takes a sample and adds features to a given features set:
+var WordExtractor = function(input, features) {
+	input.split(" ").forEach(function(word) {
+		features[word]=1;
+	});
+};
+
+// Initialize a classifier with the base classifier type and the feature extractor:
+var intentClassifier = new limdu.classifiers.EnhancedClassifier({
+	classifierType: TextClassifier,
+	normalizer: limdu.features.LowerCaseNormalizer,
+	featureExtractor: WordExtractor
+});
+
+
+// Train and test:
+intentClassifier.trainBatch([
+	{input: "Help i'm lost", output: "need_directions"},
+	{input: "I'm lost", output: "need_directions"},
+	{input: "Help me, i'm lost", output: "need_directions"},
+	{input: "I don't know where to go", output: "need_directions"},
+	{input: "Hey i'm lost", output: "need_directions"},
+	{input: "Can i have directions", output: "need_directions"},
+	{input: "I'm not sure where to go", output: "need_directions"},
+	{input: "I'm unsure where to go", output: "need_directions"},
+
+	{input: "Hi i'm checking my flight", output: "check_flight"},
+	{input: "Hi i need to check about my flight", output: "check_flight"},
+	{input: "Hi do you think you can help me check my flight?", output: "check_flight"},
+	{input: "What's my flight", output: "check_flight"},
+	{input: "Can you help me check flight details?", output: "check_flight"},
+	{input: "Can i check my flight details?", output: "check_flight"},
+	{input: "Can i check my flight details", output: "check_flight"},
+	{input: "Can i check my flight timing?", output: "check_flight"},
+	{input: "Can i check my flight timing", output: "check_flight"},
+	{input: "Can i check my boarding gate?", output: "check_flight"},
+	{input: "Can i check my boarding gate", output: "check_flight"},
+	{input: "Can i check my boarding time?", output: "check_flight"},
+	{input: "Can i check my boarding time", output: "check_flight"},
+
+	// umm add flight details
+	// flight diming
+	// flight timing
+	// boarding gate
+	// boarding time
+]);
+
+
+// Here's how to use our test data
+// intentClassifier.classify("I want an apple and a banana") // ['apl','bnn']
+
+/*
+ * END machine learning stuffs here!
+ */
+
 
 var url = 'mongodb://localhost:27017/sia';
 MongoClient.connect(url, function(err, db) {
@@ -29,6 +95,22 @@ bot.on('error', (err) => {
 
 bot.on('message', (payload, reply) => {
 	var fbid = payload.sender.id;
+	var userQuery = payload.message.text;
+	var queryType = intentClassifier.classify(userQuery) // E.g. ['need_directions','check_flight']
+
+	for (var i = 0; i < queryType.length; i++){
+		if (queryType[i] == "need_directions"){
+			reply("holy shit, need_directions work",function(err, info){
+				console.log("holy shit, need_directions work");
+			});
+
+		} else if (queryType[i] == "check_flight"){
+			reply("holy shit, check_flight work",function(err, info){
+				console.log("holy shit, check_flight work");
+			});
+		}
+	}
+
 
 	bot.getProfile(fbid, (err, profile) => {
 		if (err) throw err;

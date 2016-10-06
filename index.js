@@ -434,6 +434,8 @@ function checkFlight(flightID, reply){
 			'Accept': 'application/json'
 		}
 	}, function(requestErr, requestRes, requestBody){
+		console.log(requestBody);
+		console.log(requestBody.success);
 		if (requestBody.success) {
 			var responseText = "Here are your flight details for " + flightID + ":\nFlight Date - " + requestBody.flightDate + "\n Terminal Number - " + requestBody.flightRecord[0].terminal + "\n Flight Duration - " + requestBody.flightRecord[0].duration + "\n Headed For - " + requestBody.flightRecord[0].city;
 

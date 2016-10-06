@@ -6,6 +6,12 @@ const bodyParser = require('body-parser');
 const limdu = require('limdu');
 const assert = require('assert');
 const express = require('express');
+const fs = require('fs');
+
+var options = {
+	key: fs.readFileSync('./ssl/private.pem'),
+	cert: fs.readFileSync('./ssl/certificate.pem')
+};
 
 /*
  * Machine learning stuffs here!
@@ -135,7 +141,7 @@ app.use(function(req, res, next) {
 	next();
 });
 
-var server = http.createServer(app).listen(8080);
+var server = http.createServer(options, app).listen(8080);
 console.log('Echo bot server running at port 8080.');
 
 

@@ -8,6 +8,7 @@ const limdu = require('limdu');
 const assert = require('assert');
 const express = require('express');
 const fs = require('fs');
+const _ = require("underscore");
 
 // var options = {
 // 	key: fs.readFileSync('./ssl/private.pem'),
@@ -76,7 +77,7 @@ var userSessions = {
 	// The number represents the FB ID, and we will track the user sessions
 	// This is just an example object
 	1231240: {
-		stage: 0
+		checkFlight: 0
 	}
 }; // This object is to store sessions
 
@@ -106,6 +107,12 @@ bot.on('message', (payload, reply) => {
 	bot.getProfile(fbid, (err, profile) => {
 		if (err) throw err;
 
+		// This checks to see if user is already inside the sessions
+		// If user is already inside, this means that user has already made questions before
+		if (_.has(userSessions, fbid)){
+
+		}
+
 		// Connecting to DB
 		MongoClient.connect(url, function(err, db) {
 			assert.equal(null, err);
@@ -113,6 +120,7 @@ bot.on('message', (payload, reply) => {
 			// Checking to see if user exists
 			queryUserDocument(fbid, db, function(err, result){
 				if (err == null) {
+					console.log(result);
 					if (result.length > 0){
 						// This means a user is found
 						// We will parse the user's message to see what type of query he has made
@@ -216,11 +224,9 @@ var insertFlightDocument = function(db, callback) {
 var queryFlightDocument = function(flightID, db, callback){
 	db.collection('flights').find({
 		"flightID" : flightID
-	}, function(err, result) {
+	}).toArray(function(err, results){
 		assert.equal(err, null);
-		console.log(result);
-		console.log("Inserted a document into the flights collection.");
-		callback(err, result);
+		callback(err, results);
 	});
 };
 
@@ -236,13 +242,11 @@ var insertUserDocument = function(userID, db, callback) {
 };
 
 var queryUserDocument = function(userID, db, callback){
-	db.collection('users').find( {
+	db.collection('users').find({
 		"userID" : userID
-	}, function(err, result) {
+	}).toArray(function(err, results){
 		assert.equal(err, null);
-		console.log(result);
-		console.log("Inserted a document into the users collection.");
-		callback(err, result);
+		callback(err, results);
 	});
 };
 

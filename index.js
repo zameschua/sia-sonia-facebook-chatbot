@@ -136,6 +136,7 @@ bot.on('message', (payload, reply) => {
 						// This means a user is found
 						// We will parse the user's message to see what type of query he has made
 						sendReply(fbid, queryType, reply);
+						db.close();
 					} else {
 						insertUserDocument(fbid, db, function(err, result){
 							reply({text: "It seems like you're a first time user, we've registered an account for you!"}, function(err, info){
@@ -146,9 +147,9 @@ bot.on('message', (payload, reply) => {
 				} else {
 					// TODO must check to see if user has sent a registration number instead
 					defaultReply(reply);
+					db.close();
 				}
 			});
-			db.close();
 		});
 
 	});

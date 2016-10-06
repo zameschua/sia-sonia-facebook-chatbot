@@ -101,24 +101,18 @@ bot.on('message', (payload, reply) => {
 				if (err == null) {
 					if (result.length > 0){
 						// This means a user is found
-
 						// We will parse the user's message to see what type of query he has made
-						for (var i = 0; i < queryType.length; i++){
-							if (queryType[i] == "need_directions"){
-								console.log("holy shit, need_directions work");
-								sendDirections(reply);
-							} else if (queryType[i] == "check_flight"){
-								console.log("holy shit, check_flight work");
-								checkFlight(reply);
-							} else {
-								defaultReply(reply);
-							}
-						}
+						sendReply(queryType, reply);
 					} else {
-						defaultReply(reply);
+						insertUserDocument(fbid, function(err, result){
+							reply({text: "It seems like you're a first time user, we've added registered an account for you!"}, function(err, info){
+								sendReply(queryType, reply);
+							});
+						});
 					}
 				} else {
-					console.log(err);
+					// TODO must check to see if user has sent a registration number instead
+					defaultReply(reply);
 				}
 			});
 			db.close();
@@ -206,7 +200,7 @@ var insertFlightDocument = function(db, callback) {
 };
 
 var queryFlightDocument = function(flightID, db, callback){
-	db.collection('flights').find( {
+	db.collection('flights').find({
 		"flightID" : flightID
 	}, function(err, result) {
 		assert.equal(err, null);
@@ -219,6 +213,7 @@ var queryFlightDocument = function(flightID, db, callback){
 var insertUserDocument = function(db, callback) {
 	db.collection('users').insertOne( {
 		"userID": "", // This could be the FBID etc
+		"flightID": [] // A user could have many flights purchased
 	}, function(err, result) {
 		assert.equal(err, null);
 		console.log("Inserted a document into the users collection.");
@@ -236,6 +231,21 @@ var queryUserDocument = function(userID, db, callback){
 		callback(err, result);
 	});
 };
+
+
+function sendReply(queryType, reply){
+	for (var i = 0; i < queryType.length; i++){
+		if (queryType[i] == "need_directions"){
+			console.log("holy shit, need_directions work");
+			sendDirections(reply);
+		} else if (queryType[i] == "check_flight"){
+			console.log("holy shit, check_flight work");
+			checkFlight(reply);
+		} else {
+			defaultReply(reply);
+		}
+	}
+}
 
 
 function sendDirections(reply){

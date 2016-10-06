@@ -10,6 +10,7 @@ const express = require('express');
 const fs = require('fs');
 const _ = require("underscore");
 
+
 /*
  * Machine learning stuffs here!
  */
@@ -125,9 +126,6 @@ bot.on('message', (payload, reply) => {
 	bot.getProfile(fbid, (err, profile) => {
 		if (err) throw err;
 
-
-
-
 		// Connecting to DB
 		MongoClient.connect(url, function(err, db) {
 			assert.equal(null, err);
@@ -139,7 +137,6 @@ bot.on('message', (payload, reply) => {
 						// This means a user is found
 
 						// This will assume user is typing in a flight ID, because he typed something alphanumeric
-						console.log(user);
 						if (/((^[0-9]+[a-z]+)|(^[a-z]+[0-9]+))+[0-9a-z]+$/i.test(userQuery)){
 							var params = {
 								"userID": fbid,
@@ -205,7 +202,7 @@ app.get('/test', (req, res)=> {
 		userQuery = req.query.message;
 	}
 
-	var queryType = intentClassifier.classify(userQuery) // E.g. ['need_directions','check_flight']
+	var queryType = intentClassifier.classify(userQuery); // E.g. ['need_directions','check_flight']
 
 	for (var i = 0; i < queryType.length; i++){
 		if (queryType[i] == "need_directions"){
@@ -279,7 +276,7 @@ var updateUserDocument = function(userID, data, db, callback){
 
 function sendReply(user, fbid, queryType, reply){
 
-	if (user.length > 0){
+	if (queryType.length > 0){
 		if (user[0].flightID == ""){
 			askForFlightNumber(reply);
 			return;
@@ -289,7 +286,7 @@ function sendReply(user, fbid, queryType, reply){
 			if (queryType[i] == "need_directions"){
 				sendDirections(reply);
 			} else if (queryType[i] == "check_flight"){
-				checkFlight(reply);
+				checkFlight(user[0].flightID, reply);
 			} else if (queryType[i] == "remind_me"){
 				remindMe(user[0].flightID, reply);
 			} else if (queryType[i] == "check_weather"){
@@ -304,7 +301,8 @@ function sendReply(user, fbid, queryType, reply){
 		}
 
 	} else {
-		// This means user document wasn't found, which shouldn't be possible
+		// This means there wasn't any sensible analysis on the user's input
+		defaultReply(reply);
 	}
 
 }
@@ -352,12 +350,40 @@ function remindMe(flightID, reply){
 }
 
 function checkWeather(flightID, reply){
-	reply({text:"Based on your flight ID of: " + flightID +  ", the weather at Singapore will be rainy " +
-	"at the time which you touch down!"}, function(err, info) {
-		if (err) {
-			console.log(err);
+	var flightAlpha = flightID.replace(/[0-9]/g, '');
+	var flightNum = flightID.replace(/\D/g,'');
+
+	// Make an immediate reply first so that user doesn't think its lagging!
+	reply({text: "Searching your flight details for you! This may take some time, please be patient!"}, function(err, info){});
+
+	// Make a request to find flight details, where we subsequently parse it for more details
+	request({
+		url: "https://flifo-qa.api.aero/flifo/v3/flight/sin/" + flightAlpha + "/" + flightNum + "/d",
+		headers: {
+			'X-apiKey': '2cfd0827f82ceaccae7882938b4b1627',
+			'Accept': 'application/json'
+		}
+	}, function(requestErr, requestRes, requestBody){
+		if (requestRes.success) {
+			var responseText = "Based on your flight ID of: " + flightID + ", the weather at " + requestRes.flightRecord[0].city + " will be " + "rainy" + " at the time you touch down!";
+
+			reply({text: responseText}, function(err, info) {
+				if (err) {
+					console.log(err);
+				}
+			});
+		} else {
+			reply({
+				text: "It seems like you gave wrong flight details, because we can't find any flight data. :( Do let us know if you have a different Flight Number!"
+			}, function (err, info) {
+				if (err) {
+					console.log(err);
+				}
+			});
 		}
 	});
+
+
 }
 
 function negativeResponse(reply){
@@ -376,16 +402,45 @@ function positiveResponse(reply){
 	});
 }
 
-function checkFlight(reply){
-	reply({text:"Here are your flight details: "}, function(err, info) {
-		if (err) {
-			console.log(err);
+function checkFlight(flightID, reply){
+	var flightAlpha = flightID.replace(/[0-9]/g, '');
+	var flightNum = flightID.replace(/\D/g,'');
+
+	// Make an immediate reply first so that user doesn't think its lagging!
+	reply({text: "Searching your flight details for you! This may take some time, please be patient!"}, function(err, info){});
+
+	// Make a request to find flight details, where we subsequently parse it for more details
+	request({
+		url: "https://flifo-qa.api.aero/flifo/v3/flight/sin/" + flightAlpha + "/" + flightNum + "/d",
+		headers: {
+			'X-apiKey': '2cfd0827f82ceaccae7882938b4b1627',
+			'Accept': 'application/json'
+		}
+	}, function(requestErr, requestRes, requestBody){
+		if (requestRes.success) {
+			var responseText = "Here are your flight details for " + flightID + ":\nFlight Date - " + requestRes.flightDate + "\n Terminal Number - " + requestRes.flightRecord[0].terminal + "\n Flight Duration - " + requestRes.flightRecord[0].duration + "\n Headed For - " + requestRes.flightRecord[0].city;
+
+			reply({
+				text: responseText
+			}, function (err, info) {
+				if (err) {
+					console.log(err);
+				}
+			});
+		} else {
+			reply({
+				text: "It seems like you gave wrong flight details, because we can't find any flight data. :( Do let us know if you have a different Flight Number!"
+			}, function (err, info) {
+				if (err) {
+					console.log(err);
+				}
+			});
 		}
 	});
 }
 
 function defaultReply(reply){
-	reply({text:"Sorry i don't understand your query!"}, function(err, info) {
+	reply({text:"Sorry i don't understand your query! :("}, function(err, info) {
 		if (err) {
 			console.log(err);
 		}

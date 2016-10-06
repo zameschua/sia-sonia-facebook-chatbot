@@ -145,7 +145,7 @@ bot.on('message', (payload, reply) => {
 								"userID": fbid,
 								"directions": 0,
 								"checkFlight": 0,
-								"flightID": flightID
+								"flightID": userQuery
 							};
 							updateUserDocument(fbid, params, db, function(err, result){
 								if (!err){

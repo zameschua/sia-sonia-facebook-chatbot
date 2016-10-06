@@ -284,7 +284,7 @@ function sendReply(user, fbid, queryType, reply){
 			if (queryType[i] == "need_directions"){
 				sendDirections(reply);
 			} else if (queryType[i] == "check_flight"){
-				checkFlight(user[0].flightID, reply);
+				checkFlight(false, user[0].flightID, reply);
 			} else if (queryType[i] == "remind_me"){
 				remindMe(user[0].flightID, reply);
 			} else if (queryType[i] == "check_weather"){
@@ -342,7 +342,11 @@ function remindMe(flightID, reply){
 
 
 	reply({text:"Okay sure! Based on your flight ID of: " + flightID +  ", We will remind you 7 days, 3 days, 1 day, " +
-	"and also 5 hours before your flight! (But for proof of concept, we shall remind you in 10 seconds! :)"}, function(err, info) {
+	"and also 5 hours before your flight! (But for proof of concept, we shall remind you in 7 seconds! :)"}, function(err, info) {
+		setTimeout(function(){
+			checkFlight(false, flightID, reply);
+		}, 7000);
+
 		if (err) {
 			console.log(err);
 		}
@@ -412,12 +416,15 @@ function greetingsResponse(reply){
 	});
 }
 
-function checkFlight(flightID, reply){
+function checkFlight(shouldGreet, flightID, reply){
 	var flightAlpha = flightID.replace(/[0-9]/g, '');
 	var flightNum = flightID.replace(/([a-zA-Z ])/g,'');
 
-	// Make an immediate reply first so that user doesn't think its lagging!
-	reply({text: "Searching your flight details for you! This may take some time, please be patient!"}, function(err, info){});
+	if (shouldGreet) {
+		// Make an immediate reply first so that user doesn't think its lagging!
+		reply({text: "Searching your flight details for you! This may take some time, please be patient!"}, function (err, info) {
+		});
+	}
 
 	// Make a request to find flight details, where we subsequently parse it for more details
 	request({
@@ -430,7 +437,7 @@ function checkFlight(flightID, reply){
 		requestBody = JSON.parse(requestBody);
 
 		if (requestBody.success) {
-			var responseText = "Here are your flight details for " + flightID + ":\nFlight Date - " + requestBody.flightDate + "\n Terminal Number - " + requestBody.flightRecord[0].terminal + "\n Flight Duration - " + requestBody.flightRecord[0].duration + "\n Headed For - " + requestBody.flightRecord[0].city;
+			var responseText = "Here are your flight details for " + flightID + ":\nFlight Date - " + requestBody.flightDate + "\nTerminal Number - " + requestBody.flightRecord[0].terminal + "\nFlight Duration - " + (requestBody.flightRecord[0].duration/60).toFixed(1) + "hrs \nHeaded For - " + requestBody.flightRecord[0].city;
 
 			reply({
 				text: responseText

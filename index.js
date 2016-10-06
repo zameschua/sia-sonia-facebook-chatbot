@@ -72,6 +72,13 @@ intentClassifier.trainBatch([
  * END machine learning stuffs here!
  */
 
+var userSessions = {
+	// The number represents the FB ID, and we will track the user sessions
+	// This is just an example object
+	1231240: {
+		stage: 0
+	}
+}; // This object is to store sessions
 
 var url = 'mongodb://localhost:27017/sia';
 MongoClient.connect(url, function(err, db) {
@@ -82,7 +89,7 @@ MongoClient.connect(url, function(err, db) {
 
 
 var bot = new Bot({
-  token: 'EAAaKuvOeZCMsBAAWz7G9Ovrt4uDS6P62itRhbCmGtQtmJIFW0bgZAk0eim9hWO8eZAbhNQV4wTZAAxtI8ZCYkBUW9XVvZClw2UpD1J6wVmNgZBnp0IZAQfKGGWgLTqDUfZCxTjqSabrFHPVyDCAmy4A9zQ3b8KYruhEGfAtxDk7rruwZDZD',
+  token: 'EAAaKuvOeZCMsBABaAi3Qd1X4ddP9TQ4L0WLNgG9q2VZAtolXR9MqmgRE6uiIpT11wKCgPqWJ2GXUW8BfIXA50MDdjWzi8L5jgTEr57Vx50IAZCZAFpxMy4GEK1QigvkLrUP157xeAlyKLMQDsBOD1WcuR917vBoxCGZBCnOjYLQZDZD',
   verify: 'sia-app-challenge-bot'
 });
 

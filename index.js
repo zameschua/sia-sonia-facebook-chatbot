@@ -371,8 +371,8 @@ function checkWeather(flightID, reply){
 			'Accept': 'application/json'
 		}
 	}, function(requestErr, requestRes, requestBody){
-		if (requestRes.success) {
-			var responseText = "Based on your flight ID of: " + flightID + ", the weather at " + requestRes.flightRecord[0].city + " will be " + "rainy" + " at the time you touch down!";
+		if (requestBody.success) {
+			var responseText = "Based on your flight ID of: " + flightID + ", the weather at " + requestBody.flightRecord[0].city + " will be " + "rainy" + " at the time you touch down!";
 
 			reply({text: responseText}, function(err, info) {
 				if (err) {
@@ -434,11 +434,8 @@ function checkFlight(flightID, reply){
 			'Accept': 'application/json'
 		}
 	}, function(requestErr, requestRes, requestBody){
-		console.log (requestErr);
-		console.log(requestRes);
-		console.log(requestBody);
-		if (requestRes.success) {
-			var responseText = "Here are your flight details for " + flightID + ":\nFlight Date - " + requestRes.flightDate + "\n Terminal Number - " + requestRes.flightRecord[0].terminal + "\n Flight Duration - " + requestRes.flightRecord[0].duration + "\n Headed For - " + requestRes.flightRecord[0].city;
+		if (requestBody.success) {
+			var responseText = "Here are your flight details for " + flightID + ":\nFlight Date - " + requestBody.flightDate + "\n Terminal Number - " + requestBody.flightRecord[0].terminal + "\n Flight Duration - " + requestBody.flightRecord[0].duration + "\n Headed For - " + requestBody.flightRecord[0].city;
 
 			reply({
 				text: responseText

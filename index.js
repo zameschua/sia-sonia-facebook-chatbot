@@ -90,6 +90,11 @@ intentClassifier.trainBatch([
 	{input: "Appreciate it!", output: "positive_response"},
 	{input: "Thank you", output: "positive_response"},
 
+	{input: "Hey there", output: "greetings"},
+	{input: "Hi", output: "greetings"},
+	{input: "Nice to meet you", output: "greetings"},
+	{input: "I need help", output: "greetings"},
+	{input: "Hello", output: "greetings"},
 ]);
 
 
@@ -295,6 +300,8 @@ function sendReply(user, fbid, queryType, reply){
 				negativeResponse(reply);
 			} else if (queryType[i] == "positive_response"){
 				positiveResponse(reply);
+			} else if (queryType[i] == "greetings"){
+				greetingsResponse(reply);
 			} else {
 				defaultReply(reply);
 			}
@@ -351,7 +358,7 @@ function remindMe(flightID, reply){
 
 function checkWeather(flightID, reply){
 	var flightAlpha = flightID.replace(/[0-9]/g, '');
-	var flightNum = flightID.replace(/\D/g,'');
+	var flightNum = flightID.replace(/([a-zA-Z ])/g,'');
 
 	// Make an immediate reply first so that user doesn't think its lagging!
 	reply({text: "Searching your flight details for you! This may take some time, please be patient!"}, function(err, info){});
@@ -402,9 +409,17 @@ function positiveResponse(reply){
 	});
 }
 
+function greetingsResponse(reply){
+	reply({text: "Hey there! How can i help? :)"}, function(err, info) {
+		if (err) {
+			console.log(err);
+		}
+	});
+}
+
 function checkFlight(flightID, reply){
 	var flightAlpha = flightID.replace(/[0-9]/g, '');
-	var flightNum = flightID.replace(/\D/g,'');
+	var flightNum = flightID.replace(/([a-zA-Z ])/g,'');
 
 	// Make an immediate reply first so that user doesn't think its lagging!
 	reply({text: "Searching your flight details for you! This may take some time, please be patient!"}, function(err, info){});

@@ -136,7 +136,7 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-var server = http.createServer(options, app).listen(8080);
+var server = http.createServer(app).listen(8080);
 console.log('Echo bot server running at port 8080.');
 
 

@@ -140,7 +140,7 @@ bot.on('message', (payload, reply) => {
 
 						// This will assume user is typing in a flight ID, because he typed something alphanumeric
 						console.log(user);
-						if (user[0].flightID != "" && /((^[0-9]+[a-z]+)|(^[a-z]+[0-9]+))+[0-9a-z]+$/i.test(userQuery)){
+						if (/((^[0-9]+[a-z]+)|(^[a-z]+[0-9]+))+[0-9a-z]+$/i.test(userQuery)){
 							var params = {
 								"userID": fbid,
 								"directions": 0,

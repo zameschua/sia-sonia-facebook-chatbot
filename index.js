@@ -139,6 +139,7 @@ bot.on('message', (payload, reply) => {
 						// This means a user is found
 
 						// This will assume user is typing in a flight ID, because he typed something alphanumeric
+						console.log(user);
 						if (/^[a-z0-9]+$/i.test(userQuery)){
 							var params = {
 								"userID": fbid,
@@ -338,6 +339,7 @@ function sendDirections(reply){
 }
 
 function remindMe(flightID, reply){
+	//TODO add make a request to find out about flight
 	// var flightNum = userQuery.replace(/^\D+/g, '');
 
 

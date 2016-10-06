@@ -1,4 +1,5 @@
 const http = require('http');
+const https = require('https');
 const Bot = require('messenger-bot');
 const request = require('request');
 const MongoClient = require('mongodb').MongoClient;
@@ -141,7 +142,7 @@ app.use(function(req, res, next) {
 	next();
 });
 
-var server = http.createServer(options, app).listen(8080);
+var server = https.createServer(options, app).listen(8080);
 console.log('Echo bot server running at port 8080.');
 
 

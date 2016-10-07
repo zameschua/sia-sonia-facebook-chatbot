@@ -312,6 +312,8 @@
         }).done(function(data){
             console.log(data);
 
+            var allMessages = [];
+
             if (data.length == 0){
                 $("#all-chat-messages").loadTemplate($("#chat-right-template"),
                         {
@@ -340,8 +342,27 @@
                             thumbnail: '/assets/img/user-1.jpg',
                             message: data[i].message
                         }, {append: true});
+                    allMessages.push(data[i].message);
                 }
+
+//                "https://gateway-a.watsonplatform.net/calls/text/TextGetCombinedData?apikey=%API_KEY%"
             }
+
+//            curl -X POST -d "outputMode=json" -d "extract=entities,keywords" -d "sentiment=1" -d "maxRetrieve=1" -d "url=https://www.ibm.com/us-en/"
+
+                    $.ajax({
+                        url: "https://gateway-a.watsonplatform.net/calls/text/TextGetCombinedData?apikey=1889a7223446a6db5776d1e94a3887409ddbc319",
+                        method: "POST",
+                        data: {
+                            extract: "entities,keywords",
+                            sentiment: 1,
+                            maxRetrieve: 1,
+                            text: allMessages.toString(),
+                            outputMode: "json"
+                        }
+                    }).done(function(done){
+                        console.log(done);
+                    });
 
         });
 

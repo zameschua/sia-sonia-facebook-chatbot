@@ -319,7 +319,7 @@
                         {
                             name: data[i].userID,
                             date: data[i].timestamp,
-                            thumbnail: data[i].timestamp,
+                            thumbnail: '/assets/img/sonia.jpg',
                             message: data[i].message
                         }, {append: true});
                 } else {
@@ -327,7 +327,7 @@
                         {
                             name: data[i].userID,
                             date: data[i].timestamp,
-                            thumbnail: data[i].timestamp,
+                            thumbnail: 'https://graph.facebook.com/' + data[i].userID + '/picture',
                             message: data[i].message
                         }, {append: true});
                 }

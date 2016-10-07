@@ -19,6 +19,12 @@ Features Included
 - Dashboard to allow administrators to learn about user's emotions as well as sentiments
 - View simple analytics about the number of users interacting with chat bot
 
+How It Works
+------------
+
+SONIA uses feature extraction and recognition from her conversation with her users. It uses the 'N Grams Of Words' as well as 'N Grams Of Letters' algorithm for feature analysis of conversations. With online training, SONIA can get better and more accurate with understanding how users communicate. By the usage of IBM Watsons API, we're able to analyse the conversations that users have with the bot, in order to check for positivity or negativity. 
+
+
 Packages Used
 -------------
 
@@ -30,4 +36,5 @@ Packages Used
 - limdu.js (Machine Learning)
 - facebook-messenger (Used as the chat bot)
 - Serve-static (Used to serve the dashboard)
+- IBM Watsons API
 

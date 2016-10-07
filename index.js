@@ -474,7 +474,26 @@ function negativeResponse(reply){
 }
 
 function positiveResponse(reply){
-	reply({text: "Great! It has been nice chatting! :)"}, function(err, info) {
+	reply({"message": {
+		"text":"Great! It has been nice chatting! :) Care to feedback?",
+		"quick_replies":[
+			{
+				"content_type":"text",
+				"title": "Great",
+				"payload":"Great job!"
+			},
+			{
+				"content_type":"text",
+				"title": "Meh",
+				"payload":"Feels meh"
+			},
+			{
+				"content_type":"text",
+				"title":"Lousy",
+				"payload":"That was bad"
+			}
+		]
+	}}, function(err, info) {
 		if (err) {
 			console.log(err);
 		}

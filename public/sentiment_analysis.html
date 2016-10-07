@@ -421,7 +421,7 @@
                         $("#all-chat-messages").loadTemplate($("#chat-right-template"),
                                 {
                                     name: "SONIA",
-                                    date: moment(data[i].timestamp).format("dddd, MMMM Do YYYY, h:mm a"),
+                                    date: moment(data[i].timestamp).format("dddd, MMM Do, h:mm a"),
                                     thumbnail: '/assets/img/sonia.jpg',
                                     message: data[i].message
                                 }, {append: true});
@@ -429,7 +429,7 @@
                         $("#all-chat-messages").loadTemplate($("#chat-left-template"),
                                 {
                                     name: data[i].userID,
-                                    date: moment(data[i].timestamp).format("dddd, MMMM Do YYYY, h:mm a"),
+                                    date: moment(data[i].timestamp).format("dddd, MMM Do, h:mm a"),
                                     thumbnail: '/assets/img/user-1.jpg',
                                     message: data[i].message
                                 }, {append: true});

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8" />
+    <title>SONIA | SIA Chatbot Sentiment Analysis</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+
+    <script src="assets/plugins/jquery-1.8.2/jquery-1.8.2.min.js"></script>
+    <script src="assets/plugins/jquery-ui-1.10.4/ui/minified/jquery-ui.min.js"></script>
+    <script src="assets/js/jquery.template.js"></script>
+    <!-- ================== BEGIN BASE CSS STYLE ================== -->
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    <link href="assets/plugins/jquery-ui-1.10.4/themes/base/minified/jquery-ui.min.css" rel="stylesheet" />
+    <link href="assets/plugins/bootstrap-3.2.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/plugins/font-awesome-4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="assets/css/animate.min.css" rel="stylesheet" />
+    <link href="assets/css/style.min.css" rel="stylesheet" />
+    <link href="assets/css/style-responsive.min.css" rel="stylesheet" />
+    <link href="assets/css/theme/default.css" rel="stylesheet" id="theme" />
+    <!-- ================== END BASE CSS STYLE ================== -->
+
+    <!-- ================== BEGIN PAGE LEVEL CSS STYLE ================== -->
+    <link href="assets/plugins/jquery-jvectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" />
+    <link href="assets/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+    <link href="assets/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+    <link href="assets/plugins/morris/morris.css" rel="stylesheet" />
+    <!-- ================== END PAGE LEVEL CSS STYLE ================== -->
+</head>
+<body>
+<!-- begin #page-loader -->
+<div id="page-loader" class="fade in"><span class="spinner"></span></div>
+<!-- end #page-loader -->
+
+<!-- begin #page-container -->
+<div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+    <!-- begin #header -->
+    <div id="header" class="header navbar navbar-default navbar-fixed-top">
+        <!-- begin container-fluid -->
+        <div class="container-fluid">
+            <!-- begin mobile sidebar expand / collapse button -->
+            <div class="navbar-header">
+                <a href="index.html" class="navbar-brand"><span class="navbar-logo"></span> SONIA</a>
+                <button type="button" class="navbar-toggle" data-click="sidebar-toggled">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <!-- end mobile sidebar expand / collapse button -->
+
+            <!-- begin header navigation right -->
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <form class="navbar-form full-width">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Enter keyword" />
+                            <button type="submit" class="btn btn-search"><i class="fa fa-search"></i></button>
+                        </div>
+                    </form>
+                </li>
+
+                <li class="dropdown navbar-user">
+                    <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="assets/img/user-13.jpg" alt="" />
+                        <span class="hidden-xs">SIA Sales</span> <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu animated fadeInLeft">
+                        <li class="arrow"></li>
+                        <li><a href="javascript:;">Edit Profile</a></li>
+                        <li><a href="javascript:;"><span class="badge badge-danger pull-right">2</span> Inbox</a></li>
+                        <li><a href="javascript:;">Calendar</a></li>
+                        <li><a href="javascript:;">Setting</a></li>
+                        <li class="divider"></li>
+                        <li><a href="javascript:;">Log Out</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <!-- end header navigation right -->
+        </div>
+        <!-- end container-fluid -->
+    </div>
+    <!-- end #header -->
+
+    <!-- begin #sidebar -->
+    <div id="sidebar" class="sidebar">
+        <!-- begin sidebar scrollbar -->
+        <div data-scrollbar="true" data-height="100%">
+            <!-- begin sidebar user -->
+            <ul class="nav">
+                <li class="nav-profile">
+                    <div class="image">
+                        <a href="javascript:;"><img src="assets/img/user-13.jpg" alt="" /></a>
+                    </div>
+                    <div class="info">
+                        SIA Sales
+                        <small>Customer Service Rep</small>
+                    </div>
+                </li>
+            </ul>
+            <!-- end sidebar user -->
+            <!-- begin sidebar nav -->
+            <ul class="nav">
+                <li class="nav-header">Navigation</li>
+                <li class="has-sub active">
+                    <a href="javascript:;">
+                        <b class="caret pull-right"></b>
+                        <i class="fa fa-laptop"></i>
+                        <span>
+						        Dashboard
+					        </span>
+                    </a>
+                    <ul class="sub-menu">
+                        <li class=""><a href="index.html">Overview</a></li>
+                        <li class="active"><a href="index.html">Sentiment Analysis<i class="fa fa-paper-plane text-theme m-l-5"></i></a></li>
+                    </ul>
+                </li>
+                <!-- begin sidebar minify button -->
+                <li><a href="javascript:;" class="sidebar-minify-btn" data-click="sidebar-minify"><i class="fa fa-angle-double-left"></i></a></li>
+                <!-- end sidebar minify button -->
+            </ul>
+            <!-- end sidebar nav -->
+        </div>
+        <!-- end sidebar scrollbar -->
+    </div>
+    <div class="sidebar-bg"></div>
+    <!-- end #sidebar -->
+
+    <!-- begin #content -->
+    <div id="content" class="content">
+        <!-- begin breadcrumb -->
+        <ol class="breadcrumb pull-right">
+            <li><a href="javascript:;">Home</a></li>
+            <li><a href="javascript:;">Dashboard</a></li>
+            <li class="active">Sentiment Analysis</li>
+        </ol>
+        <!-- end breadcrumb -->
+        <!-- begin page-header -->
+        <h1 class="page-header">Sentiment Analysis<small> Different metrics showing how customers feel</small></h1>
+        <!-- end page-header -->
+        <!-- begin row -->
+
+        <!-- end row -->
+        <!-- begin row -->
+
+        <script type="text/html" id="chat-left-template">
+            <li class="left">
+                <span data-content="date" class="date-time"></span>
+                <a href="javascript:;" data-content="name" class="name"></a>
+                <a href="javascript:;" class="image"><img alt="" data-src="thumbnail" src="assets/img/user-12.jpg" /></a>
+                <div data-content="message" class="message">
+                </div>
+            </li>
+        </script>
+
+        <script type="text/html" id="chat-right-template">
+            <li class="right">
+                <span data-content="date" class="date-time"></span>
+                <a href="javascript:;" data-content="name" class="name"><span class="label label-primary">BOT</span> SONIA</a>
+                <a href="javascript:;" class="image"><img alt="" data-src="thumbnail" src="assets/img/user-12.jpg" /></a>
+                <div data-content="message" class="message">
+                </div>
+            </li>
+        </script>
+
+        <div class="row">
+            <!-- begin col-4 -->
+            <div class="col-md-4">
+                <!-- begin panel -->
+                <div class="panel panel-inverse">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">All Conversations</h4>
+                    </div>
+                    <div class="panel-body bg-silver">
+                        <div class="panel-body bg-silver">
+                            <div data-scrollbar="true" data-height="500px">
+                                <ul id="all-chat-messages" class="chats">
+
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end panel -->
+            </div>
+            <div class="col-md-8">
+                <!-- begin panel -->
+                <div class="panel panel-inverse">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">Keyword Analysis</h4>
+                    </div>
+                    <div class="panel-body bg-silver">
+                        <canvas id="keywordFrequencyChart" width="400" height="400"></canvas>
+                    </div>
+                </div>
+                <!-- end panel -->
+            </div>
+            <!-- end col-4 -->
+            <!-- begin col-4 -->
+            <div class="col-md-12">
+                <!-- begin panel -->
+                <div class="panel panel-inverse">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">Sentiment Analysis</h4>
+                    </div>
+                    <canvas id="keywordSentimentChart" width="1200" height="300"></canvas>
+                </div>
+                <!-- end panel -->
+            </div>
+
+        <!-- end row -->
+    </div>
+    <!-- end #content -->
+
+    <!-- begin theme-panel -->
+    <div class="theme-panel">
+        <a href="javascript:;" data-click="theme-panel-expand" class="theme-collapse-btn"><i class="fa fa-cog"></i></a>
+        <div class="theme-panel-content">
+            <h5 class="m-t-0">Color Theme</h5>
+            <ul class="theme-list clearfix">
+                <li class="active"><a href="javascript:;" class="bg-green" data-theme="default" data-click="theme-selector" data-toggle="tooltip" data-trigger="hover" data-container="body" data-title="Default">&nbsp;</a></li>
+                <li><a href="javascript:;" class="bg-red" data-theme="red" data-click="theme-selector" data-toggle="tooltip" data-trigger="hover" data-container="body" data-title="Red">&nbsp;</a></li>
+                <li><a href="javascript:;" class="bg-blue" data-theme="blue" data-click="theme-selector" data-toggle="tooltip" data-trigger="hover" data-container="body" data-title="Blue">&nbsp;</a></li>
+                <li><a href="javascript:;" class="bg-purple" data-theme="purple" data-click="theme-selector" data-toggle="tooltip" data-trigger="hover" data-container="body" data-title="Purple">&nbsp;</a></li>
+                <li><a href="javascript:;" class="bg-orange" data-theme="orange" data-click="theme-selector" data-toggle="tooltip" data-trigger="hover" data-container="body" data-title="Orange">&nbsp;</a></li>
+                <li><a href="javascript:;" class="bg-black" data-theme="black" data-click="theme-selector" data-toggle="tooltip" data-trigger="hover" data-container="body" data-title="Black">&nbsp;</a></li>
+            </ul>
+            <div class="divider"></div>
+            <div class="row m-t-10">
+                <div class="col-md-5 control-label double-line">Header Styling</div>
+                <div class="col-md-7">
+                    <select name="header-styling" class="form-control input-sm">
+                        <option value="1">default</option>
+                        <option value="2">inverse</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row m-t-10">
+                <div class="col-md-5 control-label">Header</div>
+                <div class="col-md-7">
+                    <select name="header-fixed" class="form-control input-sm">
+                        <option value="1">fixed</option>
+                        <option value="2">default</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row m-t-10">
+                <div class="col-md-5 control-label double-line">Sidebar Styling</div>
+                <div class="col-md-7">
+                    <select name="sidebar-styling" class="form-control input-sm">
+                        <option value="1">default</option>
+                        <option value="2">grid</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row m-t-10">
+                <div class="col-md-5 control-label">Sidebar</div>
+                <div class="col-md-7">
+                    <select name="sidebar-fixed" class="form-control input-sm">
+                        <option value="1">fixed</option>
+                        <option value="2">default</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end theme-panel -->
+
+    <!-- begin scroll to top btn -->
+    <a href="javascript:;" class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade" data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
+    <!-- end scroll to top btn -->
+</div>
+<!-- end page container -->
+
+<!-- ================== BEGIN BASE JS ================== -->
+
+<script src="assets/plugins/bootstrap-3.2.0/js/bootstrap.min.js"></script>
+<!--[if lt IE 9]>
+<script src="assets/crossbrowserjs/html5shiv.js"></script>
+<script src="assets/crossbrowserjs/respond.min.js"></script>
+<script src="assets/crossbrowserjs/excanvas.min.js"></script>
+<![endif]-->
+<script src="assets/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script src="assets/plugins/jquery-cookie/jquery.cookie.js"></script>
+<!-- ================== END BASE JS ================== -->
+
+<!-- ================== BEGIN PAGE LEVEL JS ================== -->
+
+<script src="assets/js/Chart.min.js"></script>
+<script src="assets/plugins/morris/raphael.min.js"></script>
+<script src="assets/plugins/morris/morris.js"></script>
+<script src="assets/plugins/jquery-jvectormap/jquery-jvectormap-1.2.2.min.js"></script>
+<script src="assets/plugins/jquery-jvectormap/jquery-jvectormap-world-merc-en.js"></script>
+<script src="assets/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+<script src="assets/plugins/gritter/js/jquery.gritter.js"></script>
+<script src="assets/js/dashboard-v2.min.js"></script>
+<script src="assets/js/apps.min.js"></script>
+
+<!-- ================== END PAGE LEVEL JS ================== -->
+<script>
+    $(document).ready(function() {
+        App.init();
+
+        $.ajax({
+            url: "/retrieve_conversations",
+            method: "GET"
+        }).done(function(data){
+            console.log(data);
+
+            for (var i = 0; i < data.length; i++){
+
+                if (data.userID == "BOT") {
+                    $("#all-chat-messages").loadTemplate($("#chat-right-template"),
+                        {
+                            name: data.userID,
+                            date: data.timestamp,
+                            thumbnail: data.timestamp,
+                            message: data.message
+                        }, {append: true});
+                } else {
+                    $("#all-chat-messages").loadTemplate($("#chat-left-template"),
+                        {
+                            name: data.userID,
+                            date: data.timestamp,
+                            thumbnail: data.timestamp,
+                            message: data.message
+                        }, {append: true});
+                }
+            }
+
+        });
+
+    });
+</script>
+
+
+<script>
+    function displayChart(arrayOfKeywords, arrayOfFrequency) {
+        var ctx = document.getElementById("keywordFrequencyChart");
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: arrayOfKeywords, //Array for labels ["Keyword", "Keyword", "Keyword", "Keyword", "Keyword", "Keyword"]
+                datasets: [{
+                    label: 'Frequency',
+                    data: arrayOfFrequency, //Array for data [12, 19, 3, 5, 2, 3]
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255,99,132,1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+        return myChart;
+    }
+    var keywordFrequencyChart = displayChart( ["Keyword", "Keyword", "Keyword", "Keyword", "Keyword", "Keyword"], [12, 19, 3, 5, 2, 3]);
+</script>
+
+<script>
+    function displayFreqChart(arrayOfKeywords, arrayOfSentiments) {
+        var ctx = document.getElementById("keywordSentimentChart");
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: arrayOfKeywords, //Array for labels ["Keyword", "Keyword", "Keyword", "Keyword", "Keyword", "Keyword"]
+                datasets: [{
+                    label: 'Frequency',
+                    data: arrayOfSentiments, //Array for sentiments [0.9, 0.62, 0.3, 0, -0.5, -0.89, -0.99]
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255,99,132,1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+        return myChart;
+    }
+    var keywordSentimentChart = displayFreqChart(["Keyword", "Keyword", "Keyword", "Keyword", "Keyword", "Keyword"], [0.9, 0.62, 0.3, 0, -0.5, -0.89, -0.99]);
+</script>
+
+
+</body>
+</html>
+

@@ -5,11 +5,15 @@
 <!--<![endif]-->
 <head>
 	<meta charset="utf-8" />
-	<title>SONIA | Sentiment Analysis For SIA</title>
+	<title>SONIA | SIA Chatbot Dashboard</title>
 	<meta content="width=device-width, initial-scale=1.0" name="viewport" />
 	<meta content="" name="description" />
 	<meta content="" name="author" />
-	
+
+
+	<script src="assets/plugins/jquery-1.8.2/jquery-1.8.2.min.js"></script>
+	<script src="assets/plugins/jquery-ui-1.10.4/ui/minified/jquery-ui.min.js"></script>
+	<script src="assets/js/jquery.template.js"></script>
 	<!-- ================== BEGIN BASE CSS STYLE ================== -->
 	<link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
 	<link href="assets/plugins/jquery-ui-1.10.4/themes/base/minified/jquery-ui.min.css" rel="stylesheet" />
@@ -113,7 +117,7 @@
 					    </a>
 						<ul class="sub-menu">
 						    <li class="active"><a href="index.html">Overview<i class="fa fa-paper-plane text-theme m-l-5"></i></a></li>
-							<li class=""><a href="index.html">Sentiment Analysis</a></li>
+							<li class=""><a href="sentiment_analysis.html">Sentiment Analysis</a></li>
 						</ul>
 					</li>
 			        <!-- begin sidebar minify button -->
@@ -145,8 +149,8 @@
 			    <div class="col-md-4 col-sm-6">
 			        <div class="widget widget-stats bg-green">
 			            <div class="stats-icon stats-icon-lg"><i class="fa fa-globe fa-fw"></i></div>
-			            <div class="stats-title underline">TODAY'S VISITS</div>
-			            <div class="stats-number">7,842,900</div>
+			            <div class="stats-title underline">VISITS TO CHANGI AIRPORT</div>
+			            <div class="stats-number">1,842,900</div>
 			            <div class="stats-progress progress">
                             <div class="progress-bar" style="width: 70.1%;"></div>
                         </div>
@@ -159,11 +163,11 @@
 			        <div class="widget widget-stats bg-blue">
 			            <div class="stats-icon stats-icon-lg"><i class="fa fa-smile-o fa-fw"></i></div>
 			            <div class="stats-title">SATISFIED USERS</div>
-			            <div class="stats-number">180,200</div>
+			            <div class="stats-number">1,423,132</div>
 			            <div class="stats-progress progress">
-                            <div class="progress-bar" style="width: 40.5%;"></div>
+                            <div class="progress-bar" style="width: 77.5%;"></div>
                         </div>
-                        <div class="stats-desc">Better than last week (40.5%)</div>
+                        <div class="stats-desc">Better than last week (77.5%)</div>
 			        </div>
 			    </div>
 			    <!-- end col-3 -->
@@ -184,7 +188,7 @@
 			    <div class="col-md-4 col-sm-12">
 			        <div class="widget widget-stats bg-black">
 			            <div class="stats-icon stats-icon-lg"><i class="fa fa-comments fa-fw"></i></div>
-			            <div class="stats-title">TOTAL MESSAGES</div>
+			            <div class="stats-title">TOTAL MESSAGES EXCHANGED</div>
 			            <div class="stats-number">3,988</div>
 			            <div class="stats-progress progress">
                             <div class="progress-bar" style="width: 54.9%;"></div>
@@ -248,87 +252,9 @@
 			<!-- end row -->
 			<!-- begin row -->
 			<div class="row">
-			    <!-- begin col-4 -->
-			    <div class="col-md-4">
-			        <!-- begin panel -->
-			        <div class="panel panel-inverse">
-			            <div class="panel-heading">
-			                <h4 class="panel-title">Chat History <span class="label label-success pull-right">4 message</span></h4>
-			            </div>
-			            <div class="panel-body bg-silver">
-                            <div data-scrollbar="true" data-height="225px">
-                                <ul class="chats">
-                                    <li class="left">
-                                        <span class="date-time">yesterday 11:23pm</span>
-                                        <a href="javascript:;" class="name">Sowse Bawdy</a>
-                                        <a href="javascript:;" class="image"><img alt="" src="assets/img/user-12.jpg" /></a>
-                                        <div class="message">
-                                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit volutpat. Praesent mattis interdum arcu eu feugiat.
-                                        </div>
-                                    </li>
-                                    <li class="right">
-                                        <span class="date-time">08:12am</span>
-                                        <a href="index_v2.html#" class="name"><span class="label label-primary">ADMIN</span> Me</a>
-                                        <a href="javascript:;" class="image"><img alt="" src="assets/img/user-13.jpg" /></a>
-                                        <div class="message">
-                                            Nullam posuere, nisl a varius rhoncus, risus tellus hendrerit neque.
-                                        </div>
-                                    </li>
-                                    <li class="left">
-                                        <span class="date-time">09:20am</span>
-                                        <a href="index_v2.html#" class="name">Neck Jolly</a>
-                                        <a href="javascript:;" class="image"><img alt="" src="assets/img/user-10.jpg" /></a>
-                                        <div class="message">
-                                            Euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
-                                        </div>
-                                    </li>
-                                    <li class="left">
-                                        <span class="date-time">11:15am</span>
-                                        <a href="index_v2.html#" class="name">Shag Strap</a>
-                                        <a href="javascript:;" class="image"><img alt="" src="assets/img/user-14.jpg" /></a>
-                                        <div class="message">
-                                            Nullam iaculis pharetra pharetra. Proin sodales tristique sapien mattis placerat.
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="panel-footer">
-                            <form name="send_message_form" data-id="message-form">
-                                <div class="input-group">
-                                    <input type="text" class="form-control input-sm" name="message placeholder="Enter your message here.">
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-primary btn-sm" type="button">Send</button>
-                                    </span>
-                                </div>
-                            </form>
-                        </div>
-			        </div>
-			        <!-- end panel -->
-			    </div>
 			    <!-- end col-4 -->
 			    <!-- begin col-4 -->
-			    <div class="col-md-4">
-			        <!-- begin panel -->
-			        <div class="panel panel-inverse">
-			            <div class="panel-heading">
-			                <h4 class="panel-title">Today's Schedule</h4>
-			            </div>
-			            <div id="schedule-calendar" class="bootstrap-calendar"></div>
-			            <div class="list-group">
-                            <a href="index_v2.html#" class="list-group-item text-ellipsis">
-                                <span class="badge badge-success">9:00 am</span> Sales Reporting
-                            </a> 
-                            <a href="index_v2.html#" class="list-group-item text-ellipsis">
-                                <span class="badge badge-primary">2:45 pm</span> Have a meeting with sales team
-                            </a>
-                        </div>
-			        </div>
-			        <!-- end panel -->
-			    </div>
-			    <!-- end col-4 -->
-			    <!-- begin col-4 -->
-			    <div class="col-md-4">
+			    <div class="col-md-12">
 			        <!-- begin panel -->
 			        <div class="panel panel-inverse">
 			            <div class="panel-heading">
@@ -465,8 +391,7 @@
 	<!-- end page container -->
 	
 	<!-- ================== BEGIN BASE JS ================== -->
-	<script src="assets/plugins/jquery-1.8.2/jquery-1.8.2.min.js"></script>
-	<script src="assets/plugins/jquery-ui-1.10.4/ui/minified/jquery-ui.min.js"></script>
+
 	<script src="assets/plugins/bootstrap-3.2.0/js/bootstrap.min.js"></script>
 	<!--[if lt IE 9]>
 		<script src="assets/crossbrowserjs/html5shiv.js"></script>
@@ -493,16 +418,6 @@
 			DashboardV2.init();
 		});
 	</script>
-	<script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-    
-      ga('create', 'UA-53034621-1', 'auto');
-      ga('send', 'pageview');
-    
-    </script>
 </body>
 </html>
 

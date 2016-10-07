@@ -132,6 +132,8 @@ bot.on('message', (payload, reply) => {
 	var userQuery = payload.message.text;
 	var queryType = intentClassifier.classify(userQuery); // E.g. ['need_directions','check_flight']
 
+
+
 	bot.getProfile(fbid, (err, profile) => {
 		if (err) throw err;
 
@@ -139,9 +141,14 @@ bot.on('message', (payload, reply) => {
 		MongoClient.connect(url, function(err, db) {
 			assert.equal(null, err);
 
+
+
 			// Checking to see if user exists
 			queryUserDocument(fbid, db, function(err, user){
 				if (err == null) {
+
+
+
 					if (user.length > 0){
 						// This means a user is found
 
@@ -155,7 +162,9 @@ bot.on('message', (payload, reply) => {
 							};
 							updateUserDocument(fbid, params, db, function(err, result){
 								if (!err){
+									insertConversation(fbid, userQuery, db, function(err, result){});
 									reply({text: "Ok we've noted your flight number! How can i help you?"}, function(err, info){});
+									insertConversation(fbid, "Ok we've noted your flight number! How can i help you?", db, function(err, result){});
 								}
 								db.close();
 							});
@@ -165,9 +174,11 @@ bot.on('message', (payload, reply) => {
 							db.close();
 						}
 					} else {
+						insertConversation(fbid, userQuery, db, function(err, result){});
 						insertUserDocument(fbid, db, function(err, result){
 							reply({text: "It seems like you're a first time user, we've registered an account for you!"}, function(err, info){
 								askForFlightNumber(reply);
+								insertConversation(fbid, "It seems like you're a first time user, we've registered an account for you!", db, function(err, result){});
 							});
 						});
 					}
@@ -197,6 +208,16 @@ console.log('Echo bot server running at port 8080.');
 
 app.get('/', (req, res) => {
 	return bot._verify(req, res)
+});
+
+app.get('/retrieve_conversations', (req, res) => {
+	MongoClient.connect(url, function(err, db) {
+		assert.equal(null, err);
+		retrieveConversations(db, function (err, result) {
+			res.send(result);
+			db.close();
+		});
+	});
 });
 
 app.post('/', (req, res) => {
@@ -272,7 +293,60 @@ var updateUserDocument = function(userID, data, db, callback){
 	});
 };
 
+var insertConversation = function(userID, msg, db, callback){
+	db.collection('conversations').insertOne({
+		"userID": userID, // This could be the FBID etc, and it will say "BOT" if it is the bot
+		"message": msg,
+		"timestamp": new Date()
+	}, function(err, result) {
+		assert.equal(err, null);
+		console.log("Inserted a document into the conversations collection.");
+		callback(err, result);
+	});
+};
+
+var retrieveConversations = function(db, callback){
+	db.collection('conversations').find({}).toArray(function(err, results){
+		assert.equal(err, null);
+		callback(err, results);
+	});
+};
+
+var insertKeyword = function(sentence, keyword, count, sentiment, db, callback) {
+	db.collection('keywords').insertOne({
+		"sentence": sentence,
+		"keyword": keyword,
+		"count": count,
+		"sentiment": sentiment
+	}, function(err, result) {
+		assert.equal(err, null);
+		callback(err, result);
+	});
+};
+
+var pullKeywords = function(db, callback){
+	var array = db.collection('keywords').find().toArray(function(err, results){
+		assert.equal(err, null);
+		callback(err, results);
+	});
+	var arrayOfSentiments = [];
+	var arrayOfKeywords = [];
+	for (var x in array) {
+		arrayOfSentiments.push([x.sentence, x.sentiment]); //[sentance, sentiment score]
+		arrayOfKeywords.push([x.keyword, x.count]); //[keyword, count of that keyword]
+	}
+	arrayOfKeywords.sort(function(a, b) { //Sort the array of keywords by count
+		return a[1] > b[1] ? 1 : -1;
+	});
+	console.log(arrayOfSentiments);
+	console.log(arrayOfKeywords);
+};
+
+
+
 function sendReply(user, fbid, queryType, reply){
+
+	insertConversation(fbid, userQuery, db, function(err, result){});
 
 	if (queryType.length > 0){
 		if (user[0].flightID == ""){
@@ -388,8 +462,6 @@ function checkWeather(flightID, reply){
 			});
 		}
 	});
-
-
 }
 
 function negativeResponse(reply){

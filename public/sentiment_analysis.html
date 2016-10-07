@@ -192,7 +192,7 @@
                 <!-- begin panel -->
                 <div class="panel panel-inverse">
                     <div class="panel-heading">
-                        <h4 class="panel-title">Keyword Analysis</h4>
+                        <h4 class="panel-title">Emotional Analysis</h4>
                     </div>
                     <div class="panel-body bg-silver">
                         <canvas id="keywordFrequencyChart" width="400" height="400"></canvas>
@@ -313,7 +313,7 @@
             data: {
                 labels: arrayOfKeywords, //Array for labels ["Keyword", "Keyword", "Keyword", "Keyword", "Keyword", "Keyword"]
                 datasets: [{
-                    label: 'Frequency',
+                    label: 'Emotional Score',
                     data: arrayOfFrequency, //Array for data [12, 19, 3, 5, 2, 3]
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
@@ -346,7 +346,7 @@
         });
         return myChart;
     }
-    var keywordFrequencyChart = displayChart( ["Keyword", "Keyword", "Keyword", "Keyword", "Keyword", "Keyword"], [12, 19, 3, 5, 2, 3]);
+
 </script>
 
 <script>
@@ -457,46 +457,56 @@
 
                     var allKeys = [];
                     var allScores = [];
+                    var allEmotions = [];
+                    var allEmotionScores = [];
                     for (var i = 0; i < allKeywords.length; i++){
                         var key = allKeywords[i].text;
                         var score = allKeywords[i].sentiment.score;
 
+
                         allKeys.push(key);
                         allScores.push(score);
+
                     }
+
+                    var emotions = data.docEmotions;
+                    allEmotions.push("Anger", "Disgust", "Fear", "Joy", "Sadness");
+                    allEmotionScores.push(emotions.anger, emotions.disgust, emotions.fear, emotions.joy, emotions.sadness);
 
                     var keywordSentimentChart = displayFreqChart(allKeys, allScores);
+                    var keywordFrequencyChart = displayChart(allEmotions, allEmotionScores);
+
 
                 });
 
-                $.ajax({
-                    url: "https://gateway-a.watsonplatform.net/calls/text/TextGetCombinedData?apikey=1889a7223446a6db5776d1e94a3887409ddbc319",
-                    method: "POST",
-                    data: {
-                        extract: "keywords",
-                        sentiment: 1,
-                        maxRetrieve: 1,
-                        text: allMessages.toString(),
-                        outputMode: "json"
-                    }
-                }).done(function(data){
-                    console.log(data);
-
-//                    var allKeywords = data.keywords;
-//
-//                    var allKeys = [];
-//                    var allScores = [];
-//                    for (var i = 0; i < allKeywords.length; i++){
-//                        var key = allKeywords[i].text;
-//                        var score = allKeywords[i].sentiment.score;
-//
-//                        allKeys.push(key);
-//                        allScores.push(score);
+//                $.ajax({
+//                    url: "https://gateway-a.watsonplatform.net/calls/text/TextGetCombinedData?apikey=1889a7223446a6db5776d1e94a3887409ddbc319",
+//                    method: "POST",
+//                    data: {
+//                        extract: "keywords",
+//                        sentiment: 1,
+//                        maxRetrieve: 1,
+//                        text: allMessages.toString(),
+//                        outputMode: "json"
 //                    }
+//                }).done(function(data){
+//                    console.log(data);
 //
-//                    var keywordSentimentChart = displayFreqChart(allKeys, allScores);
-
-                });
+////                    var allKeywords = data.keywords;
+////
+////                    var allKeys = [];
+////                    var allScores = [];
+////                    for (var i = 0; i < allKeywords.length; i++){
+////                        var key = allKeywords[i].text;
+////                        var score = allKeywords[i].sentiment.score;
+////
+////                        allKeys.push(key);
+////                        allScores.push(score);
+////                    }
+////
+////                    var keywordSentimentChart = displayFreqChart(allKeys, allScores);
+//
+//                });
 
 
 

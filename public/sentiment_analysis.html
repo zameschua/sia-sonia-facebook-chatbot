@@ -357,7 +357,7 @@
             data: {
                 labels: arrayOfKeywords, //Array for labels ["Keyword", "Keyword", "Keyword", "Keyword", "Keyword", "Keyword"]
                 datasets: [{
-                    label: 'Frequency',
+                    label: 'Sentiment Score',
                     data: arrayOfSentiments, //Array for sentiments [0.9, 0.62, 0.3, 0, -0.5, -0.89, -0.99]
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
@@ -444,7 +444,7 @@
                     url: "https://gateway-a.watsonplatform.net/calls/text/TextGetCombinedData?apikey=1889a7223446a6db5776d1e94a3887409ddbc319",
                     method: "POST",
                     data: {
-                        extract: "doc-sentiment,keywords",
+                        extract: "doc-emotion,doc-sentiment,keywords",
                         sentiment: 1,
                         maxRetrieve: 1,
                         text: allMessages.toString(),
@@ -469,7 +469,41 @@
 
                 });
 
+                $.ajax({
+                    url: "https://gateway-a.watsonplatform.net/calls/text/TextGetCombinedData?apikey=1889a7223446a6db5776d1e94a3887409ddbc319",
+                    method: "POST",
+                    data: {
+                        extract: "keywords",
+                        sentiment: 1,
+                        maxRetrieve: 1,
+                        text: allMessages.toString(),
+                        outputMode: "json"
+                    }
+                }).done(function(data){
+                    console.log(data);
+
+//                    var allKeywords = data.keywords;
+//
+//                    var allKeys = [];
+//                    var allScores = [];
+//                    for (var i = 0; i < allKeywords.length; i++){
+//                        var key = allKeywords[i].text;
+//                        var score = allKeywords[i].sentiment.score;
+//
+//                        allKeys.push(key);
+//                        allScores.push(score);
+//                    }
+//
+//                    var keywordSentimentChart = displayFreqChart(allKeys, allScores);
+
+                });
+
             });
+
+
+            });
+
+
 
         });
     </script>

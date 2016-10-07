@@ -302,72 +302,7 @@
 <script src="assets/js/apps.min.js"></script>
 
 <!-- ================== END PAGE LEVEL JS ================== -->
-<script>
-    $(document).ready(function() {
-        App.init();
 
-        $.ajax({
-            url: "/retrieve_conversations",
-            method: "GET"
-        }).done(function(data){
-            console.log(data);
-
-            var allMessages = [];
-
-            if (data.length == 0){
-                $("#all-chat-messages").loadTemplate($("#chat-right-template"),
-                        {
-                            name: "SONIA",
-                            date: "now",
-                            thumbnail: '/assets/img/sonia.jpg',
-                            message: "Sorry, no messages here for now!"
-                        }, {append: true});
-            }
-
-            for (var i = 0; i < data.length; i++){
-
-                if (data[i].userID == "BOT") {
-                    $("#all-chat-messages").loadTemplate($("#chat-right-template"),
-                        {
-                            name: "SONIA",
-                            date: data[i].timestamp,
-                            thumbnail: '/assets/img/sonia.jpg',
-                            message: data[i].message
-                        }, {append: true});
-                } else {
-                    $("#all-chat-messages").loadTemplate($("#chat-left-template"),
-                        {
-                            name: data[i].userID,
-                            date: data[i].timestamp,
-                            thumbnail: '/assets/img/user-1.jpg',
-                            message: data[i].message
-                        }, {append: true});
-                    allMessages.push(data[i].message);
-                }
-
-//                "https://gateway-a.watsonplatform.net/calls/text/TextGetCombinedData?apikey=%API_KEY%"
-            }
-
-//            curl -X POST -d "outputMode=json" -d "extract=entities,keywords" -d "sentiment=1" -d "maxRetrieve=1" -d "url=https://www.ibm.com/us-en/"
-
-                    $.ajax({
-                        url: "https://gateway-a.watsonplatform.net/calls/text/TextGetCombinedData?apikey=1889a7223446a6db5776d1e94a3887409ddbc319",
-                        method: "POST",
-                        data: {
-                            extract: "entities,keywords",
-                            sentiment: 1,
-                            maxRetrieve: 1,
-                            text: allMessages.toString(),
-                            outputMode: "json"
-                        }
-                    }).done(function(done){
-                        console.log(done);
-                    });
-
-        });
-
-    });
-</script>
 
 
 <script>
@@ -455,8 +390,89 @@
         });
         return myChart;
     }
-    var keywordSentimentChart = displayFreqChart(["Keyword", "Keyword", "Keyword", "Keyword", "Keyword", "Keyword"], [0.9, 0.62, 0.3, 0, -0.5, -0.89, -0.99]);
+
 </script>
+
+    <script>
+        $(document).ready(function() {
+            App.init();
+
+            $.ajax({
+                url: "/retrieve_conversations",
+                method: "GET"
+            }).done(function(data){
+                console.log(data);
+
+                var allMessages = [];
+
+                if (data.length == 0){
+                    $("#all-chat-messages").loadTemplate($("#chat-right-template"),
+                            {
+                                name: "SONIA",
+                                date: "now",
+                                thumbnail: '/assets/img/sonia.jpg',
+                                message: "Sorry, no messages here for now!"
+                            }, {append: true});
+                }
+
+                for (var i = 0; i < data.length; i++){
+
+                    if (data[i].userID == "BOT") {
+                        $("#all-chat-messages").loadTemplate($("#chat-right-template"),
+                                {
+                                    name: "SONIA",
+                                    date: data[i].timestamp,
+                                    thumbnail: '/assets/img/sonia.jpg',
+                                    message: data[i].message
+                                }, {append: true});
+                    } else {
+                        $("#all-chat-messages").loadTemplate($("#chat-left-template"),
+                                {
+                                    name: data[i].userID,
+                                    date: data[i].timestamp,
+                                    thumbnail: '/assets/img/user-1.jpg',
+                                    message: data[i].message
+                                }, {append: true});
+                        allMessages.push(data[i].message);
+                    }
+
+
+                }
+
+
+                $.ajax({
+                    url: "https://gateway-a.watsonplatform.net/calls/text/TextGetCombinedData?apikey=1889a7223446a6db5776d1e94a3887409ddbc319",
+                    method: "POST",
+                    data: {
+                        extract: "doc-sentiment,keywords",
+                        sentiment: 1,
+                        maxRetrieve: 1,
+                        text: allMessages.toString(),
+                        outputMode: "json"
+                    }
+                }).done(function(data){
+                    console.log(data);
+
+                    var allKeywords = data.keywords;
+
+                    var allKeys = [];
+                    var allScores = [];
+                    for (var i = 0; i < allKeywords.length; i++){
+                        var key = allKeywords[i].text;
+                        var score = allKeywords[i].sentiment.score;
+
+                        allKeys.push(key);
+                        allScores.push(score);
+                    }
+
+                    var keywordSentimentChart = displayFreqChart(allKeys, allScores);
+
+                });
+
+            });
+
+        });
+    </script>
 
 
 </body>

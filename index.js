@@ -474,7 +474,7 @@ function negativeResponse(reply){
 }
 
 function positiveResponse(reply){
-	reply({"message": {
+	reply({
 		"text":"Great! It has been nice chatting! :) Care to feedback?",
 		"quick_replies":[
 			{
@@ -493,7 +493,7 @@ function positiveResponse(reply){
 				"payload":"That was bad"
 			}
 		]
-	}}, function(err, info) {
+	}, function(err, info) {
 		if (err) {
 			console.log(err);
 		}

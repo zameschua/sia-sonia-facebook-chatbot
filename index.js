@@ -284,7 +284,7 @@ function sendReply(user, fbid, queryType, reply){
 			if (queryType[i] == "need_directions"){
 				sendDirections(reply);
 			} else if (queryType[i] == "check_flight"){
-				checkFlight(false, user[0].flightID, reply);
+				checkFlight(true, user[0].flightID, reply);
 			} else if (queryType[i] == "remind_me"){
 				remindMe(user[0].flightID, reply);
 			} else if (queryType[i] == "check_weather"){

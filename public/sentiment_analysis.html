@@ -314,21 +314,21 @@
 
             for (var i = 0; i < data.length; i++){
 
-                if (data.userID == "BOT") {
+                if (data[i].userID == "BOT") {
                     $("#all-chat-messages").loadTemplate($("#chat-right-template"),
                         {
-                            name: data.userID,
-                            date: data.timestamp,
-                            thumbnail: data.timestamp,
-                            message: data.message
+                            name: data[i].userID,
+                            date: data[i].timestamp,
+                            thumbnail: data[i].timestamp,
+                            message: data[i].message
                         }, {append: true});
                 } else {
                     $("#all-chat-messages").loadTemplate($("#chat-left-template"),
                         {
-                            name: data.userID,
-                            date: data.timestamp,
-                            thumbnail: data.timestamp,
-                            message: data.message
+                            name: data[i].userID,
+                            date: data[i].timestamp,
+                            thumbnail: data[i].timestamp,
+                            message: data[i].message
                         }, {append: true});
                 }
             }

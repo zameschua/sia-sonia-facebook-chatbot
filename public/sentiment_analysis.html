@@ -312,12 +312,22 @@
         }).done(function(data){
             console.log(data);
 
+            if (data.length == 0){
+                $("#all-chat-messages").loadTemplate($("#chat-right-template"),
+                        {
+                            name: "SONIA",
+                            date: "now",
+                            thumbnail: '/assets/img/sonia.jpg',
+                            message: "Sorry, no messages here for now!"
+                        }, {append: true});
+            }
+
             for (var i = 0; i < data.length; i++){
 
                 if (data[i].userID == "BOT") {
                     $("#all-chat-messages").loadTemplate($("#chat-right-template"),
                         {
-                            name: data[i].userID,
+                            name: "SONIA",
                             date: data[i].timestamp,
                             thumbnail: '/assets/img/sonia.jpg',
                             message: data[i].message
@@ -327,7 +337,7 @@
                         {
                             name: data[i].userID,
                             date: data[i].timestamp,
-                            thumbnail: 'https://graph.facebook.com/' + data[i].userID + '/picture',
+                            thumbnail: 'https://graph.facebook.com/v2.8/' + data[i].userID + '/picture',
                             message: data[i].message
                         }, {append: true});
                 }

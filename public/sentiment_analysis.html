@@ -290,7 +290,7 @@
 <!-- ================== END BASE JS ================== -->
 
 <!-- ================== BEGIN PAGE LEVEL JS ================== -->
-
+<script src="assets/plugins/moment/moment.min.js"></script>
 <script src="assets/js/Chart.min.js"></script>
 <script src="assets/plugins/morris/raphael.min.js"></script>
 <script src="assets/plugins/morris/morris.js"></script>
@@ -421,7 +421,7 @@
                         $("#all-chat-messages").loadTemplate($("#chat-right-template"),
                                 {
                                     name: "SONIA",
-                                    date: data[i].timestamp,
+                                    date: moment(data[i].timestamp).format("dddd, MMMM Do YYYY, h:mm a"),
                                     thumbnail: '/assets/img/sonia.jpg',
                                     message: data[i].message
                                 }, {append: true});
@@ -429,7 +429,7 @@
                         $("#all-chat-messages").loadTemplate($("#chat-left-template"),
                                 {
                                     name: data[i].userID,
-                                    date: data[i].timestamp,
+                                    date: moment(data[i].timestamp).format("dddd, MMMM Do YYYY, h:mm a"),
                                     thumbnail: '/assets/img/user-1.jpg',
                                     message: data[i].message
                                 }, {append: true});

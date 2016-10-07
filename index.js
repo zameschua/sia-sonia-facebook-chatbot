@@ -118,7 +118,7 @@ MongoClient.connect(url, function(err, db) {
 
 
 var bot = new Bot({
-  token: 'EAAaKuvOeZCMsBABaAi3Qd1X4ddP9TQ4L0WLNgG9q2VZAtolXR9MqmgRE6uiIpT11wKCgPqWJ2GXUW8BfIXA50MDdjWzi8L5jgTEr57Vx50IAZCZAFpxMy4GEK1QigvkLrUP157xeAlyKLMQDsBOD1WcuR917vBoxCGZBCnOjYLQZDZD',
+  token: 'EAAaKuvOeZCMsBAB3tVM1nmOyuzOvHKsM88c7mlob0K8WZBuAyVi7Hz5LRHZCZBH9r7rZBNZC8oVPxF5bMz0bhjZAwp7hkZBBAINaEg8esLqOhv28f3Lwh53KNwgKd9EY88IoEN7LUr80kwx6BsWlqw9wrjAgJkReJWqQVQ5FUtaZAZAQZDZD',
   verify: 'sia-app-challenge-bot'
 });
 

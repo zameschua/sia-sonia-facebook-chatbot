@@ -170,6 +170,7 @@ bot.on('message', (payload, reply) => {
 							});
 						} else {
 							// We will parse the user's message to see what type of query he has made
+							insertConversation(fbid, userQuery, db, function(err, result){});
 							sendReply(user, fbid, queryType, reply);
 							db.close();
 						}
@@ -346,7 +347,7 @@ var pullKeywords = function(db, callback){
 
 function sendReply(user, fbid, queryType, reply){
 
-	insertConversation(fbid, userQuery, db, function(err, result){});
+
 
 	if (queryType.length > 0){
 		if (user[0].flightID == ""){

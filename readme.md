@@ -38,3 +38,8 @@ Packages Used
 - Serve-static (Used to serve the dashboard)
 - IBM Watsons API
 
+Screenshots
+------------
+![Sonia Screenshot 1](/screenshots/SoniaCapture.jpg?raw=true "Optional Title")
+![Sonia Screenshot 2](/screenshots/SoniaCapture2.jpg?raw=true "Optional Title")
+![Sonia Screenshot 3](/screenshots/SoniaCapture3.jpg?raw=true "Optional Title")

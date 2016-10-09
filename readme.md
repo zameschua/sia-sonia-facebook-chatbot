@@ -44,4 +44,3 @@ Screenshots
 ![Sonia Screenshot 1](https://github.com/zameschua/SIA/blob/master/screenshots/SoniaCapture.JPG?raw=true)
 ![Sonia Screenshot 2](https://github.com/zameschua/SIA/blob/master/screenshots/SoniaCapture2.JPG?raw=true)
 ![Sonia Screenshot 3](https://github.com/zameschua/SIA/blob/master/screenshots/SoniaCapture3.JPG?raw=true)
-
